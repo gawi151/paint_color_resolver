@@ -295,27 +295,27 @@ dart fix --apply
 **Core Dependencies (already decided):**
 ```yaml
 dependencies:
-  flutter_riverpod: ^3.0.0  # State management
-  riverpod_annotation: ^3.0.0
-  auto_route: ^9.0.0  # Navigation
-  drift: ^2.20.0  # Local database
-  sqlite3_flutter_libs: ^0.5.0  # SQLite for drift
-  path_provider: ^2.1.0
-  dart_mappable: ^4.2.0  # Models
-  flutter_color: ^2.0.0  # Color science
+  flutter_riverpod: ^3.0.3  # State management
+  riverpod_annotation: ^3.0.3
+  auto_route: ^10.1.2  # Navigation
+  drift: ^2.28.2  # Local database
+  sqlite3_flutter_libs: ^0.5.40  # SQLite for drift
+  path_provider: ^2.1.5
+  dart_mappable: ^4.6.1  # Models
+  flutter_color: ^2.1.0  # Color science
   flutter_colorpicker: ^1.1.0  # Color picker UI
-  shadcn_ui: ^0.1.0  # Design system
-  logging: ^1.2.0  # Logging
+  shadcn_ui: ^0.37.4  # Design system
+  logging: ^1.3.0  # Logging
 
 dev_dependencies:
-  build_runner: ^2.4.0
-  riverpod_generator: ^3.0.0
-  riverpod_lint: ^3.0.0
-  auto_route_generator: ^9.0.0
-  drift_dev: ^2.20.0
-  dart_mappable_builder: ^4.2.0
-  very_good_analysis: ^6.0.0
-  test: ^1.25.0
+  build_runner: ^2.7.1
+  riverpod_generator: ^3.0.3
+  riverpod_lint: ^3.0.3
+  auto_route_generator: ^10.2.4
+  drift_dev: ^2.28.3
+  dart_mappable_builder: ^4.6.0
+  very_good_analysis: ^10.0.0
+  test: ^1.26.2
 ```
 
 **Before adding new packages:**
