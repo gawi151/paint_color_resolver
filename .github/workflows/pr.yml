@@ -1,0 +1,32 @@
+name: Flutter PR Checks
+
+on:
+  pull_request:
+    branches: [ main ] 
+
+jobs:
+  ci_checks:
+    name: Setup, Format, Analyze, and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🐦 Set up Flutter SDK from pubspec.yaml
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version-file: pubspec.yaml 
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      - name: 🧹 Verify Formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: 🔬 Run Static Code Analysis
+        run: flutter analyze
+
+      - name: 🧪 Run Flutter Tests
+        run: flutter test
