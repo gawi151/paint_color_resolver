@@ -1,0 +1,86 @@
+{
+    "outputStyle": "Learning",
+    "permissions": {
+        "deny": [
+            "Read(./.env)",
+            "Read(./.env.*)",
+            "Read(./secrets/**)",
+            "Read(./build/**)",
+            "Read(./.dart_tool/**)",
+            "Read(./android/build/**)",
+            "Read(./android/.gradle/**)",
+            "Read(./android/local.properties)",
+            "Read(./android/**/gradle-wrapper.jar)",
+            "Read(./ios/Pods/**)",
+            "Read(./ios/.symlinks/**)",
+            "Read(./ios/**/xcuserdata/**)",
+            "Read(./ios/.generated/**)",
+            "Read(./ios/Flutter/ephemeral/**)",
+            "Read(./macos/Pods/**)",
+            "Read(./macos/Flutter/ephemeral/**)",
+            "Read(./linux/flutter/ephemeral/**)",
+            "Read(./windows/flutter/ephemeral/**)",
+            "Read(**/*.g.dart)",
+            "Read(**/*.freezed.dart)",
+            "Read(**/*.gr.dart)",
+            "Read(**/*.config.dart)",
+            "Read(**/generated_plugin_registrant.dart)",
+            "Read(./.flutter-plugins)",
+            "Read(./.flutter-plugins-dependencies)",
+            "Read(./.idea/**)",
+            "Read(./.vscode/**)",
+            "Read(**/*.iml)",
+            "Read(./.DS_Store)",
+            "Read(./coverage/**)",
+            "Read(./.fvm/flutter_sdk/**)",
+            "Read(**/doc/api/**)",
+            "Read(./node_modules/**)",
+            "Read(./.git/**)"
+        ],
+        "allow": [
+            "Read(./lib/**)",
+            "Read(./test/**)",
+            "Read(./integration_test/**)",
+            "Read(./pubspec.yaml)",
+            "Read(./pubspec.lock)",
+            "Read(./analysis_options.yaml)",
+            "Read(./build.yaml)",
+            "Read(./README.md)",
+            "Read(./CLAUDE.md)",
+            "Read(./ios/Runner/Info.plist)",
+            "Read(./ios/Podfile)",
+            "Read(./ios/Runner/AppDelegate.swift)",
+            "Read(./android/app/src/main/AndroidManifest.xml)",
+            "Read(./android/app/build.gradle)",
+            "Read(./android/build.gradle)",
+            "Read(./android/app/src/main/kotlin/**/*.kt)",
+            "Read(./android/app/src/main/java/**/*.java)",
+            "Write(./lib/**)",
+            "Write(./test/**)",
+            "Write(./integration_test/**)",
+            "Write(./pubspec.yaml)",
+            "Write(./analysis_options.yaml)",
+            "Write(./build.yaml)",
+            "Write(./README.md)",
+            "Write(./CLAUDE.md)",
+            "Write(./ios/Runner/Info.plist)",
+            "Write(./android/app/src/main/AndroidManifest.xml)",
+            "Bash(flutter :*)",
+            "Bash(dart :*)",
+            "Bash(puro :*)"
+        ]
+    },
+    "hooks": {
+        "PostToolUse": [
+            {
+                "matcher": "Edit|MultiEdit|Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "dart format $FILE"
+                    }
+                ]
+            }
+        ]
+    }
+}
