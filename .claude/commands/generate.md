@@ -1,5 +1,5 @@
 ---
-description: Run build_runner to generate code (freezed, json_serializable, etc.)
+description: Run build_runner to generate code (dart_mappable, json_serializable, auto_route etc.)
 ---
 
 Run code generation:
@@ -9,7 +9,7 @@ Run code generation:
 3. Check for errors in output
 4. If successful:
    - Display: "✅ Code generation completed"
-   - List generated files (*.g.dart, *.freezed.dart)
+   - List generated files (*.g.dart, *.gr.dart, *.mapper.dart)
 5. If errors:
    - Display error details
    - Suggest fixes for common issues
