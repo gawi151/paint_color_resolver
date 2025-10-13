@@ -109,6 +109,7 @@ Use descriptive suffixes to avoid conflicts with Dart/Flutter classes:
 
 Example Riverpod 3.0 pattern:
 ```dart
+// example of modifiable (Notifier) provider with Async state
 @riverpod
 class PaintInventory extends _$PaintInventory {
   @override
@@ -125,6 +126,40 @@ class PaintInventory extends _$PaintInventory {
   }
 }
 ```
+
+```dart
+// example of unmodifiable (functional) future provider which caches value - results in userProvider
+@riverpod
+Future<User> user(Ref ref) async {
+  final response = await http.get('https://api.example.com/user/123');
+  return User.fromJson(response.body);
+}
+
+```dart
+// example of unmodifiable (functional) provider for String (can provide any object) - gives us helloWorldProvider
+@riverpod
+String helloWorld(Ref ref) {
+  return 'Hello world';
+}
+```
+
+```dart
+// example of consuming provider
+class Example extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, _) {
+        // Obtain the value of the provider
+        final helloWorld = ref.watch(helloWorldProvider);
+
+        // Use the value in the UI
+        return Text(helloWorld);
+      },
+    );
+  }
+}
+``` 
 
 ### Logging and Debugging
 
