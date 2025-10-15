@@ -8,15 +8,17 @@ import 'package:paint_color_resolver/features/color_calculation/domain/models/la
 /// Service for converting colors between RGB and CIELAB color spaces.
 ///
 /// ## Implementation Notes:
-/// - **LAB → RGB**: Uses `flutter_color` package's `CielabColor.getColorFromCielab()`
-///   which includes proper gamma correction
+/// - **LAB → RGB**: Uses `flutter_color` package's
+///   `CielabColor.getColorFromCielab()` which includes proper gamma correction
 /// - **RGB → LAB**: Custom implementation with sRGB gamma correction and
 ///   D65 illuminant (standard daylight)
 ///
 /// ## Color Space References:
 /// - sRGB specification: https://en.wikipedia.org/wiki/SRGB
-/// - D65 illuminant: https://en.wikipedia.org/wiki/Standard_illuminant#D65_values
-/// - Bruce Lindbloom's calculator: http://www.brucelindbloom.com/index.html?Calc.html
+/// - D65 illuminant:
+///   https://en.wikipedia.org/wiki/Standard_illuminant#D65_values
+/// - Bruce Lindbloom's calculator:
+///   http://www.brucelindbloom.com/index.html?Calc.html
 class ColorConverter {
   /// D65 reference white point tristimulus values.
   ///
@@ -34,7 +36,8 @@ class ColorConverter {
   ///
   /// ## Implementation:
   /// This is a custom implementation because `flutter_color` does not provide
-  /// RGB → LAB conversion. The algorithm uses standard sRGB and CIELAB formulas.
+  /// RGB → LAB conversion. The algorithm uses standard sRGB and CIELAB
+  /// formulas.
   ///
   /// ## Example:
   /// ```dart
@@ -64,17 +67,18 @@ class ColorConverter {
     final fy = _f(y / _yn);
     final fz = _f(z / _zn);
 
-    final l = 116 * fy - 16;
-    final a = 500 * (fx - fy);
-    final b = 200 * (fy - fz);
+    final l = (116 * fy - 16).clamp(0.0, 100.0);
+    final a = (500 * (fx - fy)).clamp(-128.0, 127.0);
+    final b = (200 * (fy - fz)).clamp(-128.0, 127.0);
 
     return LabColor(l: l, a: a, b: b);
   }
 
   /// Converts a CIELAB color to RGB color space.
   ///
-  /// This uses the `flutter_color` package's `CielabColor.getColorFromCielab()`
-  /// method which includes proper gamma correction and handles out-of-gamut colors.
+  /// This uses the `flutter_color` package's
+  /// `CielabColor.getColorFromCielab()` method which includes proper gamma
+  /// correction and handles out-of-gamut colors.
   ///
   /// ## Out-of-Gamut Handling:
   /// Some LAB values cannot be represented in sRGB (especially highly saturated

@@ -1,10 +1,11 @@
 {
-  "enabledMcpjsonServers": [
-    "dart-flutter"
-  ],
   "permissions": {
     "allow": [
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(dart fix:*)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "dart-flutter"
+  ]
 }

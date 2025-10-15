@@ -69,7 +69,8 @@ class MixingResult with MixingResultMappable {
 
   /// The Delta E algorithm used to calculate [deltaE].
   ///
-  /// Important: The same ΔE value has different meanings for different algorithms.
+  /// Important: The same ΔE value has different meanings for different
+  /// algorithms.
   /// - CIE76: ΔE < 5.0 is "good"
   /// - CIEDE2000: ΔE < 2.0 is "good"
   final DeltaEAlgorithm deltaEAlgorithm;

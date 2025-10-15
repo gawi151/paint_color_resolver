@@ -24,7 +24,8 @@ enum DeltaEAlgorithm {
   ciede2000,
 }
 
-/// Calculator for measuring perceptual color differences using Delta E formulas.
+/// Calculator for measuring perceptual color differences using Delta E
+/// formulas.
 ///
 /// Delta E (ΔE) measures how different two colors appear to the human eye.
 /// Lower values indicate more similar colors.
