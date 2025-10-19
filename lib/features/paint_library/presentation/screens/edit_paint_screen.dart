@@ -49,7 +49,8 @@ class EditPaintScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Paint ID: $paintId (form placeholder - implementation in progress)',
+              'Paint ID: $paintId'
+              ' (form placeholder - implementation in progress)',
               style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 24),
@@ -63,7 +64,8 @@ class EditPaintScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: () {
-                    /// TODO(painter-inventory): Update paint in inventory via provider
+                    // TODO(painter-inventory): Update paint in inventory
+                    //  via provider
                     context.router.pop();
                   },
                   child: const Text('Update'),
@@ -71,7 +73,8 @@ class EditPaintScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: () {
-                    /// TODO(painter-inventory): Delete paint from inventory via provider
+                    // TODO(painter-inventory): Delete paint from inventory
+                    //  via provider
                     context.router.pop();
                   },
                   style: ElevatedButton.styleFrom(

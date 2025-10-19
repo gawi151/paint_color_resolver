@@ -54,7 +54,8 @@ class AddPaintScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: () {
-                    /// TODO(painter-inventory): Save paint to inventory via provider
+                    // TODO(painter-inventory): Save paint to inventory
+                    //  via provider
                     context.router.pop();
                   },
                   child: const Text('Save'),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:paint_color_resolver/core/router/app_router.dart';
@@ -49,7 +51,7 @@ class PaintLibraryScreen extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                context.router.push(AddPaintRoute());
+                unawaited(context.router.push(const AddPaintRoute()));
               },
               child: const Text('Add Paint'),
             ),
@@ -58,7 +60,7 @@ class PaintLibraryScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.router.push(AddPaintRoute());
+          unawaited(context.router.push(const AddPaintRoute()));
         },
         tooltip: 'Add Paint',
         child: const Icon(Icons.add),

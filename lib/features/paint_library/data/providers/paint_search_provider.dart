@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:paint_color_resolver/core/database/app_database.dart';
 import 'package:paint_color_resolver/features/paint_library/data/providers/paint_inventory_provider.dart';
-import 'package:riverpod/src/providers/provider.dart';
 
 final _searchLog = Logger('PaintSearch');
 
@@ -56,7 +55,7 @@ final _searchLog = Logger('PaintSearch');
 /// - For large collections (1000+ paints), consider server-side filtering
 /// - Provider automatically caches results per unique query/brand combination
 /// - Debounce search input in UI to reduce excessive provider calls
-final ProviderFamily<List<PaintColor>, PaintSearchParams> paintSearchProvider =
+final paintSearchProvider =
     Provider.family<List<PaintColor>, PaintSearchParams>(
       (ref, params) {
         final inventoryAsync = ref.watch(paintInventoryProvider);
