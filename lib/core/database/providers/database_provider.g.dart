@@ -244,12 +244,15 @@ String _$paintColorsDaoHash() => r'1fa471b3e6740f3aa8d40ddd571eee6a3370f2b7';
 /// Ensures the database is seeded with initial paint data on first run.
 ///
 /// This provider runs the database seeding logic when watched, ensuring that
-/// the app always has paint inventory available for testing the mixing algorithm.
+/// the app always has paint inventory available for testing the mixing
+/// algorithm.
 ///
-/// The seeding is idempotent - subsequent app runs skip seeding if paints exist.
+/// The seeding is idempotent - subsequent app runs skip seeding if paints
+/// exist.
 ///
 /// ## Usage in App
-/// Watch this provider on startup to ensure seeding completes before showing UI:
+/// Watch this provider on startup to ensure seeding completes before showing
+/// UI:
 /// ```dart
 /// @override
 /// FutureOr<void> build() async {
@@ -263,12 +266,15 @@ const databaseInitializationProvider = DatabaseInitializationProvider._();
 /// Ensures the database is seeded with initial paint data on first run.
 ///
 /// This provider runs the database seeding logic when watched, ensuring that
-/// the app always has paint inventory available for testing the mixing algorithm.
+/// the app always has paint inventory available for testing the mixing
+/// algorithm.
 ///
-/// The seeding is idempotent - subsequent app runs skip seeding if paints exist.
+/// The seeding is idempotent - subsequent app runs skip seeding if paints
+/// exist.
 ///
 /// ## Usage in App
-/// Watch this provider on startup to ensure seeding completes before showing UI:
+/// Watch this provider on startup to ensure seeding completes before showing
+/// UI:
 /// ```dart
 /// @override
 /// FutureOr<void> build() async {
@@ -282,12 +288,15 @@ final class DatabaseInitializationProvider
   /// Ensures the database is seeded with initial paint data on first run.
   ///
   /// This provider runs the database seeding logic when watched, ensuring that
-  /// the app always has paint inventory available for testing the mixing algorithm.
+  /// the app always has paint inventory available for testing the mixing
+  /// algorithm.
   ///
-  /// The seeding is idempotent - subsequent app runs skip seeding if paints exist.
+  /// The seeding is idempotent - subsequent app runs skip seeding if paints
+  /// exist.
   ///
   /// ## Usage in App
-  /// Watch this provider on startup to ensure seeding completes before showing UI:
+  /// Watch this provider on startup to ensure seeding completes before showing
+  /// UI:
   /// ```dart
   /// @override
   /// FutureOr<void> build() async {

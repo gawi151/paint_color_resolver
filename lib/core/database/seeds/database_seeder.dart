@@ -22,10 +22,12 @@ class DatabaseSeeder {
   static Future<bool> seedIfEmpty(AppDatabase database) async {
     try {
       // Check if database already has paints
-      final existingPaintsCount =
-          await database.select(database.paintColors).get().then(
-                (paints) => paints.length,
-              );
+      final existingPaintsCount = await database
+          .select(database.paintColors)
+          .get()
+          .then(
+            (paints) => paints.length,
+          );
 
       if (existingPaintsCount > 0) {
         _log.info(

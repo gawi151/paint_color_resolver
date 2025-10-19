@@ -20,6 +20,7 @@ final _log = Logger('PaintLibrary');
 /// - Edit existing paint (tap on list item)
 /// - Delete paint (swipe or context menu)
 /// - Color preview for each paint
+/// - Mix colors using available paints (palette icon in AppBar)
 ///
 /// State Management:
 /// - Consumes `paintInventoryProvider` for full inventory
@@ -29,6 +30,7 @@ final _log = Logger('PaintLibrary');
 /// Navigation:
 /// - Routes to AddPaintScreen via FAB
 /// - Routes to EditPaintScreen on list item tap
+/// - Routes to ColorMixerRoute via palette icon (AppBar action)
 @RoutePage()
 class PaintLibraryScreen extends ConsumerStatefulWidget {
   const PaintLibraryScreen({super.key});
@@ -66,6 +68,10 @@ class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
 
   void _navigateToAddPaint() {
     unawaited(context.router.push(const AddPaintRoute()));
+  }
+
+  void _navigateToColorMixer() {
+    unawaited(context.router.push(const ColorMixerRoute()));
   }
 
   Future<void> _showDeleteConfirmation({
@@ -114,6 +120,15 @@ class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
       appBar: AppBar(
         title: const Text('Paint Inventory'),
         elevation: 0,
+        actions: [
+          Tooltip(
+            message: 'Mix Colors',
+            child: IconButton(
+              icon: const Icon(Icons.palette),
+              onPressed: _navigateToColorMixer,
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [

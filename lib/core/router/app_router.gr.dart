@@ -27,6 +27,22 @@ class AddPaintRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ColorMixerScreen]
+class ColorMixerRoute extends PageRouteInfo<void> {
+  const ColorMixerRoute({List<PageRouteInfo>? children})
+    : super(ColorMixerRoute.name, initialChildren: children);
+
+  static const String name = 'ColorMixerRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ColorMixerScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [EditPaintScreen]
 class EditPaintRoute extends PageRouteInfo<EditPaintRouteArgs> {
   EditPaintRoute({
@@ -71,6 +87,22 @@ class EditPaintRouteArgs {
 
   @override
   int get hashCode => paintId.hashCode ^ key.hashCode;
+}
+
+/// generated route for
+/// [MixingResultsScreen]
+class MixingResultsRoute extends PageRouteInfo<void> {
+  const MixingResultsRoute({List<PageRouteInfo>? children})
+    : super(MixingResultsRoute.name, initialChildren: children);
+
+  static const String name = 'MixingResultsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const MixingResultsScreen();
+    },
+  );
 }
 
 /// generated route for
