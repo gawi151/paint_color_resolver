@@ -1,5 +1,6 @@
 import 'package:paint_color_resolver/core/database/app_database.dart';
 import 'package:paint_color_resolver/core/database/daos/paint_colors_dao.dart';
+import 'package:paint_color_resolver/core/database/seeds/database_seeder.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'database_provider.g.dart';
@@ -63,4 +64,28 @@ AppDatabase database(Ref ref) {
 @riverpod
 PaintColorsDao paintColorsDao(Ref ref) {
   return ref.read(databaseProvider).paintColorsDao;
+}
+
+/// Ensures the database is seeded with initial paint data on first run.
+///
+/// This provider runs the database seeding logic when watched, ensuring that
+/// the app always has paint inventory available for testing the mixing
+/// algorithm.
+///
+/// The seeding is idempotent - subsequent app runs skip seeding if paints
+/// exist.
+///
+/// ## Usage in App
+/// Watch this provider on startup to ensure seeding completes before showing
+/// UI:
+/// ```dart
+/// @override
+/// FutureOr<void> build() async {
+///   await ref.watch(databaseInitializationProvider.future);
+/// }
+/// ```
+@riverpod
+Future<void> databaseInitialization(Ref ref) async {
+  final database = ref.read(databaseProvider);
+  await DatabaseSeeder.seedIfEmpty(database);
 }
