@@ -117,6 +117,83 @@ flutter run
 
 ---
 
+## Widget Lifecycle & Build Phase Errors
+
+### Issue: `setState() or markNeedsBuild() called during build`
+
+**Symptom:** Red error screen when widget initializes or state changes, mentions "build phase".
+
+**Causes:**
+1. Calling `setState()` inside `build()` method
+2. Calling `setState()` inside `initState()`
+3. Calling `setState()` from callbacks triggered during widget construction
+4. Modifying providers during widget build
+
+**Solution:** Defer state changes to after the build phase completes.
+
+#### Pattern 1: Initial State Setup (initState)
+```dart
+// ❌ WRONG - setState during build phase
+@override
+void initState() {
+  super.initState();
+  _selectedColor = Colors.red;
+  setState(() => _isValidGamut = true);  // ERROR!
+}
+
+// ✅ CORRECT - Defer to post-frame
+@override
+void initState() {
+  super.initState();
+  _selectedColor = Colors.red;
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (mounted) {
+      setState(() => _isValidGamut = true);
+    }
+  });
+}
+```
+
+#### Pattern 2: Callbacks & Event Handlers
+```dart
+// ❌ WRONG - setState in callback during build
+onColorChanged: (Color color) {
+  setState(() => _selectedColor = color);  // ERROR if called during build!
+}
+
+// ✅ CORRECT - Use microtask to defer
+onColorChanged: (Color color) {
+  Future.microtask(() {
+    if (!mounted) return;
+    setState(() => _selectedColor = color);
+  });
+}
+```
+
+#### Pattern 3: Provider Modifications (Riverpod)
+```dart
+// ❌ WRONG - Modify provider during build
+onColorChanged: (LabColor color) {
+  ref.read(targetColorProvider.notifier).setTargetColor(color);  // ERROR!
+}
+
+// ✅ CORRECT - Defer with microtask
+onColorChanged: (LabColor color) {
+  Future.microtask(() {
+    ref.read(targetColorProvider.notifier).setTargetColor(color);
+  });
+}
+```
+
+**Key Methods:**
+- `WidgetsBinding.instance.addPostFrameCallback()` - Run after first frame renders
+- `Future.microtask()` - Run in next microtask cycle (safe from callbacks)
+- Always check `if (!mounted)` before setState
+
+**See:** `lib/shared/widgets/color_picker_input.dart` for real-world example
+
+---
+
 ## Code Quality Checklist
 
 Before committing:

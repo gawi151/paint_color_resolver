@@ -46,3 +46,43 @@ Each feature module contains:
 3. Presentation layer → UI + State management (providers)
 
 See [riverpod.md](riverpod.md) for state management patterns.
+
+## Component Unification Pattern
+
+### Problem: Inconsistent UX Across Screens
+
+When the same feature (color picking, form input, data display) appears on multiple screens with different implementations:
+- Users experience inconsistency
+- Bugs require fixes in multiple places
+- Testing and maintenance becomes harder
+- Code duplication increases
+
+### Solution: Facade Components in `shared/widgets/`
+
+Create reusable components that unify the UI/UX:
+
+```
+Before (Inconsistent):
+├── ColorMixerScreen → Custom HSV sliders + preview
+├── AddPaintScreen → flutter_colorpicker dialog
+└── EditPaintScreen → Different picker
+
+After (Unified):
+└── ColorPickerInput (facade)
+    ├── ColorMixerScreen ✓
+    ├── AddPaintScreen (via PaintForm) ✓
+    └── EditPaintScreen (via PaintForm) ✓
+```
+
+### Real Example: Color Picking Unification
+
+**Pattern:** `lib/shared/widgets/color_picker_input.dart`
+
+Benefits:
+- **Single source of truth** - All color pickers behave identically
+- **Consistent gamut validation** - Warnings shown everywhere
+- **Easy improvements** - HueRingPicker enhancement applies to all screens
+- **Testable in isolation** - Test once, works everywhere
+- **Maintainable** - Bug fixes don't need to be replicated
+
+**Key Principle:** Extract components to `shared/widgets/` when they're used in 2+ places with the goal of unifying UX across the app.

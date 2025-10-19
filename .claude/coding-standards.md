@@ -30,6 +30,41 @@
 
 See [riverpod.md](riverpod.md) for ConsumerWidget pattern.
 
+### Facade Pattern for Component Unification
+
+When the same functionality appears on multiple screens with inconsistent UX, use the **Facade Pattern** to unify:
+
+**Problem:**
+```dart
+// ❌ Inconsistent color pickers across screens
+ColorMixerScreen → Custom HSV sliders
+AddPaintScreen → flutter_colorpicker dialog
+EditPaintScreen → Different picker again
+```
+
+**Solution: Create a facade component**
+```dart
+// ✅ GOOD: ColorPickerInput facade wraps HueRingPicker
+// - Consistent UX everywhere
+// - Single maintenance point
+// - Easy to swap implementations
+
+ColorPickerInput(
+  initialHex: '#FF5733',
+  onColorChanged: (labColor, isValidGamut) { ... },
+)
+```
+
+**Benefits:**
+- Users see the same intuitive interface everywhere
+- Bugs fixed once, fixed everywhere
+- Future picker improvements automatically apply to all screens
+- Easier to test in isolation
+
+**Pattern in codebase:**
+- `lib/shared/widgets/color_picker_input.dart` - Unifies all color picking
+- Used in: ColorMixerScreen, PaintForm (AddPaint, EditPaint)
+
 ## State Management (Riverpod 3.0)
 
 - ✅ Use `@riverpod` annotation (code generation)
