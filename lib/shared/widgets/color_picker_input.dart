@@ -73,7 +73,8 @@ class _ColorPickerInputState extends State<ColorPickerInput> {
     super.dispose();
   }
 
-  /// Updates LAB color and gamut validation, then calls callback.
+  /// Updates local LAB color and gamut validation state only.
+  /// Does NOT notify parent callback (used during initialization).
   void _updateLabAndGamut(Color color) {
     final (labColor, isValid) = ColorConversionUtils.rgbToLab(color);
 
@@ -83,7 +84,14 @@ class _ColorPickerInputState extends State<ColorPickerInput> {
           ? ''
           : ColorConversionUtils.gamutValidationMessage();
     });
+  }
 
+  /// Updates LAB color and notifies parent of the change.
+  /// Called only when user actively changes the color.
+  void _handleColorChanged(Color color) {
+    _updateLabAndGamut(color);
+
+    final (labColor, isValid) = ColorConversionUtils.rgbToLab(color);
     widget.onColorChanged(labColor, isValidGamut: isValid);
   }
 
@@ -98,7 +106,7 @@ class _ColorPickerInputState extends State<ColorPickerInput> {
       _selectedColor = newColor;
     });
 
-    _updateLabAndGamut(newColor);
+    _handleColorChanged(newColor);
   }
 
   /// Opens the color picker dialog.
@@ -132,9 +140,9 @@ class _ColorPickerInputState extends State<ColorPickerInput> {
       ),
     );
 
-    // After dialog closes, update LAB
+    // After dialog closes, notify parent of color change
     Future.delayed(const Duration(milliseconds: 300), () {
-      _updateLabAndGamut(_selectedColor);
+      _handleColorChanged(_selectedColor);
     });
   }
 
