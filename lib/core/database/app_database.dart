@@ -5,6 +5,7 @@ import 'package:paint_color_resolver/core/database/daos/paint_colors_dao.dart';
 import 'package:paint_color_resolver/core/database/tables/paint_colors.dart';
 import 'package:paint_color_resolver/core/database/type_converters/paint_brand_converter.dart';
 import 'package:paint_color_resolver/shared/models/paint_color.dart';
+import 'package:path_provider/path_provider.dart';
 
 part 'app_database.g.dart';
 
@@ -49,9 +50,34 @@ class AppDatabase extends _$AppDatabase {
   /// ```
 
   /// Opens a connection to the Drift database.
-  /// Uses SQLite via drift_flutter for Flutter apps.
+  /// Uses SQLite via drift_flutter for Flutter apps (native and web).
+  ///
+  /// For native platforms (Windows, macOS, etc.):
+  /// Uses the native SQLite library
+  ///
+  /// For web platform:
+  /// Uses WebAssembly-compiled SQLite with IndexedDB or OPFS backing
   static QueryExecutor _openConnection() {
     _log.info('Opening Paint Color Resolver database');
-    return driftDatabase(name: 'paint_resolver_db');
+    return driftDatabase(
+      name: 'paint_resolver_db',
+      native: const DriftNativeOptions(
+        databaseDirectory: getApplicationSupportDirectory,
+      ),
+      web: DriftWebOptions(
+        sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+        driftWorker: Uri.parse('drift_worker.js'),
+        onResult: (result) {
+          if (result.missingFeatures.isNotEmpty) {
+            _log.warning(
+              'Using ${result.chosenImplementation} due to unsupported '
+              'browser features: ${result.missingFeatures}',
+            );
+          } else {
+            _log.info('Using ${result.chosenImplementation} for web storage');
+          }
+        },
+      ),
+    );
   }
 }
