@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:paint_color_resolver/core/router/app_router.dart';
+import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
 import 'package:paint_color_resolver/features/color_calculation/presentation/providers/color_mixing_provider.dart';
+import 'package:paint_color_resolver/shared/utils/color_conversion_utils.dart';
+import 'package:paint_color_resolver/shared/widgets/color_picker_input.dart';
 
 final _log = Logger('ColorMixer');
 
@@ -15,7 +20,7 @@ final _log = Logger('ColorMixer');
 /// - Adjust quality threshold
 /// - Trigger the mixing calculation
 ///
-/// Once calculation completes, navigates to [MixingResultsScreen].
+/// Once calculation completes, navigates to MixingResultsScreen.
 @RoutePage()
 class ColorMixerScreen extends ConsumerStatefulWidget {
   const ColorMixerScreen({super.key});
@@ -25,7 +30,6 @@ class ColorMixerScreen extends ConsumerStatefulWidget {
 }
 
 class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
-  Color _selectedColor = Colors.red;
   bool _isCalculating = false;
 
   @override
@@ -48,7 +52,28 @@ class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
-            _buildColorPicker(context),
+            ColorPickerInput(
+              initialHex: targetColor != null
+                  ? ColorConversionUtils.labToHex(targetColor)
+                  : '#FF0000',
+              onColorChanged:
+                  (
+                    LabColor labColor, {
+                    required bool isValidGamut,
+                  }) {
+                    // Delay provider modification until after widget
+                    // tree is built
+                    final update = Future.microtask(() {
+                      ref
+                          .read(targetColorProvider.notifier)
+                          .setTargetColor(labColor);
+                      _log.info(
+                        'Target color set (Gamut: $isValidGamut)',
+                      );
+                    });
+                    unawaited(update);
+                  },
+            ),
             const SizedBox(height: 32),
 
             // Number of Paints Selection
@@ -116,75 +141,6 @@ class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
                   ],
                 ),
               ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Builds the color picker widget
-  Widget _buildColorPicker(BuildContext context) {
-    final targetColor = ref.watch(targetColorProvider);
-
-    return GestureDetector(
-      onTap: () => _showColorPicker(context),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Theme.of(context).dividerColor,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            // Color Swatch
-            Container(
-              height: 120,
-              decoration: BoxDecoration(
-                color: _selectedColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                ),
-              ),
-            ),
-
-            // Color Info
-            Container(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Selected Color',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: 4),
-                      if (targetColor != null)
-                        Text(
-                          'LAB(L:${targetColor.l.toStringAsFixed(1)}, '
-                          'a:${targetColor.a.toStringAsFixed(1)}, '
-                          'b:${targetColor.b.toStringAsFixed(1)})',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        )
-                      else
-                        Text(
-                          'No color selected',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                    ],
-                  ),
-                  Icon(
-                    Icons.edit,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -270,51 +226,6 @@ class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
     );
   }
 
-  /// Shows the color picker and updates the target color
-  void _showColorPicker(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Pick Target Color'),
-        content: ColorPicker(
-          color: _selectedColor,
-          onColorChanged: (color) {
-            setState(() => _selectedColor = color);
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Convert selected color to LAB and store
-              try {
-                final hexColor =
-                    '#${_selectedColor.toARGB32().toRadixString(16)
-                    .padLeft(8, '0')
-                    .substring(2)
-                    .toUpperCase()}';
-                ref
-                    .read(targetColorProvider.notifier)
-                    .setTargetColorFromHex(hexColor);
-                _log.info('Target color set: $hexColor');
-                Navigator.pop(context);
-              } on Exception catch (e) {
-                _log.severe('Failed to set target color', e);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: $e')),
-                );
-              }
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
   /// Calculates mixing results and navigates to results screen
   Future<void> _calculateAndNavigate(BuildContext context) async {
     setState(() => _isCalculating = true);
@@ -347,116 +258,5 @@ class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
         setState(() => _isCalculating = false);
       }
     }
-  }
-}
-
-/// Simple color picker widget
-class ColorPicker extends StatefulWidget {
-  const ColorPicker({
-    required this.color,
-    required this.onColorChanged,
-    super.key,
-  });
-
-  final Color color;
-  final ValueChanged<Color> onColorChanged;
-
-  @override
-  State<ColorPicker> createState() => _ColorPickerState();
-}
-
-class _ColorPickerState extends State<ColorPicker> {
-  late HSVColor _hsvColor;
-
-  @override
-  void initState() {
-    super.initState();
-    _hsvColor = HSVColor.fromColor(widget.color);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Hue slider
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            children: [
-              const Text('Hue:'),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Slider(
-                  value: _hsvColor.hue,
-                  max: 360,
-                  onChanged: (value) {
-                    setState(() {
-                      _hsvColor = _hsvColor.withHue(value);
-                      widget.onColorChanged(_hsvColor.toColor());
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Saturation slider
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            children: [
-              const Text('Sat:'),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Slider(
-                  value: _hsvColor.saturation,
-                  onChanged: (value) {
-                    setState(() {
-                      _hsvColor = _hsvColor.withSaturation(value);
-                      widget.onColorChanged(_hsvColor.toColor());
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Brightness slider
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            children: [
-              const Text('Brightness:'),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Slider(
-                  value: _hsvColor.value,
-                  onChanged: (value) {
-                    setState(() {
-                      _hsvColor = _hsvColor.withValue(value);
-                      widget.onColorChanged(_hsvColor.toColor());
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Color preview
-        const SizedBox(height: 12),
-        Container(
-          height: 60,
-          decoration: BoxDecoration(
-            color: widget.color,
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      ],
-    );
   }
 }

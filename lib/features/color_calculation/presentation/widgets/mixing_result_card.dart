@@ -168,9 +168,7 @@ class MixingResultCard extends ConsumerWidget {
     final ratios = <Widget>[];
 
     // Watch the paint inventory to get paint details
-    final paintInventoryAsync = ref.watch(paintInventoryProvider);
-
-    paintInventoryAsync.whenData((paints) {
+    ref.watch(paintInventoryProvider).whenData((paints) {
       // Create a map for fast lookups
       final paintMap = {for (final p in paints) p.id: p};
 
@@ -233,10 +231,11 @@ class MixingResultCard extends ConsumerWidget {
                       if (paint != null)
                         Text(
                           paint.brand.name.toUpperCase(),
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey,
-                            fontSize: 11,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Colors.grey,
+                                fontSize: 11,
+                              ),
                           overflow: TextOverflow.ellipsis,
                         ),
                     ],

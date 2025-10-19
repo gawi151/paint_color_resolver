@@ -284,8 +284,8 @@ class MixingResultsSort extends _$MixingResultsSort {
   }
 
   /// Sets the sort option for results (Riverpod pattern: methods not setters)
-
-  void setSortOption(MixingSortOption option) => state = option;
+  // ignore: use_setters_to_change_properties
+  void updateSortOption(MixingSortOption option) => state = option;
 }
 
 /// Options for sorting mixing results

@@ -55,7 +55,7 @@ class MixingResultsScreen extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(12),
                   itemCount: results.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) => MixingResultCard(
                     result: results[index],
                     index: index + 1,
@@ -200,7 +200,8 @@ class MixingResultsScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Text(
-              'Try adjusting the quality threshold or selecting a different target color',
+              'Try adjusting the quality threshold or selecting'
+              ' a different target color',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.grey,
