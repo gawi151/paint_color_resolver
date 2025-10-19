@@ -44,7 +44,7 @@ import 'package:paint_color_resolver/shared/models/paint_color.dart';
 /// // Query all paints
 /// final paints = await db.select(db.paintColors).get();
 /// ```
-@DataClassName('PaintColor')
+@DataClassName('PaintColorEntity')
 class PaintColors extends Table {
   /// Auto-incrementing primary key.
   IntColumn get id => integer().autoIncrement()();

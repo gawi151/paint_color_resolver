@@ -91,8 +91,7 @@ class ColorConversionUtils {
   /// final lab = LabColor(l: 50, a: 50, b: 50);
   /// final isValid = ColorConversionUtils.isValidSrgbGamut(lab);
   /// ```
-  static bool isValidSrgbGamut(LabColor lab) =>
-      _isValidSrgbGamut(lab);
+  static bool isValidSrgbGamut(LabColor lab) => _isValidSrgbGamut(lab);
 
   /// Internal validation check for sRGB gamut.
   ///

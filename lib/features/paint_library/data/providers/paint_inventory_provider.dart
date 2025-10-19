@@ -1,11 +1,12 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
-import 'package:paint_color_resolver/core/database/app_database.dart' hide PaintColor;
+import 'package:paint_color_resolver/core/database/app_database.dart';
 import 'package:paint_color_resolver/core/database/providers/database_provider.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
 import 'package:paint_color_resolver/features/paint_library/data/mappers/paint_color_mapper.dart';
-import 'package:paint_color_resolver/shared/models/paint_color.dart' hide PaintColorMapper;
+import 'package:paint_color_resolver/shared/models/paint_color.dart'
+    hide PaintColorMapper;
 
 final _log = Logger('PaintInventory');
 

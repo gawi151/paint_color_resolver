@@ -55,7 +55,9 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
       _log.info('Updating paint ID ${widget.paintId}: ${formData.name}');
 
       // Call the provider notifier to edit the paint
-      await ref.read(paintInventoryProvider.notifier).editPaint(
+      await ref
+          .read(paintInventoryProvider.notifier)
+          .editPaint(
             paintId: widget.paintId,
             name: formData.name,
             brand: formData.brand,
@@ -132,7 +134,9 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
       _log.info('Deleting paint ID ${widget.paintId}');
 
       // Call the provider notifier to delete the paint
-      await ref.read(paintInventoryProvider.notifier).removePaint(
+      await ref
+          .read(paintInventoryProvider.notifier)
+          .removePaint(
             widget.paintId,
           );
 
@@ -191,12 +195,12 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
       body: inventoryAsync.when(
         data: (paints) {
           // Find the paint by ID using where() to avoid StateError
-          final matchingPaints = paints.where(
-            (p) => p.id == widget.paintId,
-          ).toList();
-          final PaintColor? paint = matchingPaints.isNotEmpty
-              ? matchingPaints.first
-              : null;
+          final matchingPaints = paints
+              .where(
+                (p) => p.id == widget.paintId,
+              )
+              .toList();
+          final paint = matchingPaints.isNotEmpty ? matchingPaints.first : null;
 
           if (paint == null) {
             _log.warning('Paint ID ${widget.paintId} not found in inventory');

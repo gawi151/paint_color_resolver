@@ -40,7 +40,7 @@ class ColorPickerInput extends StatefulWidget {
   /// Callback when color is selected.
   /// Provides: (labColor, isValidGamut)
   final void Function(LabColor labColor, {required bool isValidGamut})
-      onColorChanged;
+  onColorChanged;
 
   /// Initial HEX color value (format: #RRGGBB)
   /// Defaults to white (#FFFFFF) if not provided.

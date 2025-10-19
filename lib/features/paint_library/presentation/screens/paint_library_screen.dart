@@ -199,9 +199,9 @@ class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
                     return PaintCard(
                       paint: paint,
                       onEdit: () => _navigateToEditPaint(paint.id),
-                      onDelete: () {
+                      onDelete: () async {
                         _log.info('Deleting paint: ${paint.name}');
-                        _showDeleteConfirmation(
+                        await _showDeleteConfirmation(
                           paintId: paint.id,
                           paintName: paint.name,
                           onConfirm: () async {
@@ -209,7 +209,7 @@ class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
                               await ref
                                   .read(paintInventoryProvider.notifier)
                                   .removePaint(paint.id);
-                              if (mounted) {
+                              if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text('Deleted ${paint.name}'),
@@ -219,7 +219,7 @@ class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
                               }
                             } on Exception catch (e) {
                               _log.severe('Failed to delete paint', e);
-                              if (mounted) {
+                              if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text('Error deleting paint: $e'),

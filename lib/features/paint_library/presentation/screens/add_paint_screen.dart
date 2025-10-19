@@ -46,7 +46,9 @@ class _AddPaintScreenState extends ConsumerState<AddPaintScreen> {
       _log.info('Adding paint: ${formData.name}');
 
       // Call the provider notifier to add the paint
-      await ref.read(paintInventoryProvider.notifier).addPaint(
+      await ref
+          .read(paintInventoryProvider.notifier)
+          .addPaint(
             name: formData.name,
             brand: formData.brand,
             labColor: formData.labColor,

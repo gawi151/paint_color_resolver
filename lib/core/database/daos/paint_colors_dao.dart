@@ -91,7 +91,7 @@ class PaintColorsDao extends DatabaseAccessor<AppDatabase>
   /// final allPaints = await dao.getAllPaints();
   /// print('Total paints: ${allPaints.length}');
   /// ```
-  Future<List<PaintColor>> getAllPaints() async {
+  Future<List<PaintColorEntity>> getAllPaints() async {
     _log.fine('Fetching all paints');
 
     final query = select(paintColors)
@@ -115,7 +115,7 @@ class PaintColorsDao extends DatabaseAccessor<AppDatabase>
   ///   print('Found: ${paint.name}');
   /// }
   /// ```
-  Future<PaintColor?> getPaintById(int id) async {
+  Future<PaintColorEntity?> getPaintById(int id) async {
     _log.fine('Fetching paint with ID: $id');
 
     final query = select(paintColors)..where((t) => t.id.equals(id));
@@ -132,7 +132,7 @@ class PaintColorsDao extends DatabaseAccessor<AppDatabase>
   /// final vallejoPaints = await dao.findPaintsByBrand('vallejo');
   /// print('Vallejo paints: ${vallejoPaints.length}');
   /// ```
-  Future<List<PaintColor>> findPaintsByBrand(String brand) async {
+  Future<List<PaintColorEntity>> findPaintsByBrand(String brand) async {
     _log.fine('Fetching paints for brand: $brand');
 
     final query = select(paintColors)
@@ -155,7 +155,7 @@ class PaintColorsDao extends DatabaseAccessor<AppDatabase>
   ///
   /// ## Example:
   /// ```dart
-  /// StreamBuilder<List<PaintColor>>(
+  /// StreamBuilder<List<PaintColorEntity>>(
   ///   stream: dao.watchAllPaints(),
   ///   builder: (context, snapshot) {
   ///     if (!snapshot.hasData) return CircularProgressIndicator();
@@ -166,7 +166,7 @@ class PaintColorsDao extends DatabaseAccessor<AppDatabase>
   ///   },
   /// );
   /// ```
-  Stream<List<PaintColor>> watchAllPaints() {
+  Stream<List<PaintColorEntity>> watchAllPaints() {
     _log.fine('Setting up watch stream for all paints');
 
     final query = select(paintColors)
@@ -184,7 +184,7 @@ class PaintColorsDao extends DatabaseAccessor<AppDatabase>
   ///
   /// ## Example:
   /// ```dart
-  /// StreamBuilder<PaintColor?>(
+  /// StreamBuilder<PaintColorEntity?>(
   ///   stream: dao.watchPaintById(42),
   ///   builder: (context, snapshot) {
   ///     final paint = snapshot.data;
@@ -193,7 +193,7 @@ class PaintColorsDao extends DatabaseAccessor<AppDatabase>
   ///   },
   /// );
   /// ```
-  Stream<PaintColor?> watchPaintById(int id) {
+  Stream<PaintColorEntity?> watchPaintById(int id) {
     _log.fine('Setting up watch stream for paint ID: $id');
 
     final query = select(paintColors)..where((t) => t.id.equals(id));
@@ -208,7 +208,7 @@ class PaintColorsDao extends DatabaseAccessor<AppDatabase>
   ///
   /// ## Example:
   /// ```dart
-  /// StreamBuilder<List<PaintColor>>(
+  /// StreamBuilder<List<PaintColorEntity>>(
   ///   stream: dao.watchPaintsByBrand('vallejo'),
   ///   builder: (context, snapshot) {
   ///     if (!snapshot.hasData) return CircularProgressIndicator();
@@ -216,7 +216,7 @@ class PaintColorsDao extends DatabaseAccessor<AppDatabase>
   ///   },
   /// );
   /// ```
-  Stream<List<PaintColor>> watchPaintsByBrand(String brand) {
+  Stream<List<PaintColorEntity>> watchPaintsByBrand(String brand) {
     _log.fine('Setting up watch stream for brand: $brand');
 
     final query = select(paintColors)
@@ -250,7 +250,7 @@ class PaintColorsDao extends DatabaseAccessor<AppDatabase>
   ///   print('Update successful: $success');
   /// }
   /// ```
-  Future<bool> updatePaint(PaintColor paint) async {
+  Future<bool> updatePaint(PaintColorEntity paint) async {
     _log.fine('Updating paint ID: ${paint.id}');
 
     try {

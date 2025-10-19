@@ -4,7 +4,7 @@ part of 'app_database.dart';
 
 // ignore_for_file: type=lint
 class $PaintColorsTable extends PaintColors
-    with TableInfo<$PaintColorsTable, PaintColor> {
+    with TableInfo<$PaintColorsTable, PaintColorEntity> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -135,7 +135,7 @@ class $PaintColorsTable extends PaintColors
   static const String $name = 'paint_colors';
   @override
   VerificationContext validateIntegrity(
-    Insertable<PaintColor> instance, {
+    Insertable<PaintColorEntity> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -208,9 +208,9 @@ class $PaintColorsTable extends PaintColors
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  PaintColor map(Map<String, dynamic> data, {String? tablePrefix}) {
+  PaintColorEntity map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return PaintColor(
+    return PaintColorEntity(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -265,7 +265,8 @@ class $PaintColorsTable extends PaintColors
       const PaintBrandConverter();
 }
 
-class PaintColor extends DataClass implements Insertable<PaintColor> {
+class PaintColorEntity extends DataClass
+    implements Insertable<PaintColorEntity> {
   /// Auto-incrementing primary key.
   final int id;
 
@@ -329,7 +330,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
   /// - "Running low, need to reorder"
   /// - "Slightly dried out"
   final String? notes;
-  const PaintColor({
+  const PaintColorEntity({
     required this.id,
     required this.name,
     required this.brand,
@@ -384,12 +385,12 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
     );
   }
 
-  factory PaintColor.fromJson(
+  factory PaintColorEntity.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return PaintColor(
+    return PaintColorEntity(
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       brand: serializer.fromJson<PaintBrand>(json['brand']),
@@ -419,7 +420,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
     };
   }
 
-  PaintColor copyWith({
+  PaintColorEntity copyWith({
     int? id,
     String? name,
     PaintBrand? brand,
@@ -430,7 +431,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
     DateTime? addedAt,
     DateTime? updatedAt,
     Value<String?> notes = const Value.absent(),
-  }) => PaintColor(
+  }) => PaintColorEntity(
     id: id ?? this.id,
     name: name ?? this.name,
     brand: brand ?? this.brand,
@@ -442,8 +443,8 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
     updatedAt: updatedAt ?? this.updatedAt,
     notes: notes.present ? notes.value : this.notes,
   );
-  PaintColor copyWithCompanion(PaintColorsCompanion data) {
-    return PaintColor(
+  PaintColorEntity copyWithCompanion(PaintColorsCompanion data) {
+    return PaintColorEntity(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       brand: data.brand.present ? data.brand.value : this.brand,
@@ -461,7 +462,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
 
   @override
   String toString() {
-    return (StringBuffer('PaintColor(')
+    return (StringBuffer('PaintColorEntity(')
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('brand: $brand, ')
@@ -492,7 +493,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is PaintColor &&
+      (other is PaintColorEntity &&
           other.id == this.id &&
           other.name == this.name &&
           other.brand == this.brand &&
@@ -505,7 +506,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
           other.notes == this.notes);
 }
 
-class PaintColorsCompanion extends UpdateCompanion<PaintColor> {
+class PaintColorsCompanion extends UpdateCompanion<PaintColorEntity> {
   final Value<int> id;
   final Value<String> name;
   final Value<PaintBrand> brand;
@@ -544,7 +545,7 @@ class PaintColorsCompanion extends UpdateCompanion<PaintColor> {
        labL = Value(labL),
        labA = Value(labA),
        labB = Value(labB);
-  static Insertable<PaintColor> custom({
+  static Insertable<PaintColorEntity> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? brand,
@@ -861,17 +862,17 @@ class $$PaintColorsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $PaintColorsTable,
-          PaintColor,
+          PaintColorEntity,
           $$PaintColorsTableFilterComposer,
           $$PaintColorsTableOrderingComposer,
           $$PaintColorsTableAnnotationComposer,
           $$PaintColorsTableCreateCompanionBuilder,
           $$PaintColorsTableUpdateCompanionBuilder,
           (
-            PaintColor,
-            BaseReferences<_$AppDatabase, $PaintColorsTable, PaintColor>,
+            PaintColorEntity,
+            BaseReferences<_$AppDatabase, $PaintColorsTable, PaintColorEntity>,
           ),
-          PaintColor,
+          PaintColorEntity,
           PrefetchHooks Function()
         > {
   $$PaintColorsTableTableManager(_$AppDatabase db, $PaintColorsTable table)
@@ -945,17 +946,17 @@ typedef $$PaintColorsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $PaintColorsTable,
-      PaintColor,
+      PaintColorEntity,
       $$PaintColorsTableFilterComposer,
       $$PaintColorsTableOrderingComposer,
       $$PaintColorsTableAnnotationComposer,
       $$PaintColorsTableCreateCompanionBuilder,
       $$PaintColorsTableUpdateCompanionBuilder,
       (
-        PaintColor,
-        BaseReferences<_$AppDatabase, $PaintColorsTable, PaintColor>,
+        PaintColorEntity,
+        BaseReferences<_$AppDatabase, $PaintColorsTable, PaintColorEntity>,
       ),
-      PaintColor,
+      PaintColorEntity,
       PrefetchHooks Function()
     >;
 
