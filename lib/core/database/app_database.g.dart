@@ -44,6 +44,17 @@ class $PaintColorsTable extends PaintColors
         type: DriftSqlType.string,
         requiredDuringInsert: true,
       ).withConverter<PaintBrand>($PaintColorsTable.$converterbrand);
+  static const VerificationMeta _brandMakerIdMeta = const VerificationMeta(
+    'brandMakerId',
+  );
+  @override
+  late final GeneratedColumn<String> brandMakerId = GeneratedColumn<String>(
+    'brand_maker_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _labLMeta = const VerificationMeta('labL');
   @override
   late final GeneratedColumn<double> labL = GeneratedColumn<double>(
@@ -109,6 +120,7 @@ class $PaintColorsTable extends PaintColors
     id,
     name,
     brand,
+    brandMakerId,
     labL,
     labA,
     labB,
@@ -138,6 +150,15 @@ class $PaintColorsTable extends PaintColors
       );
     } else if (isInserting) {
       context.missing(_nameMeta);
+    }
+    if (data.containsKey('brand_maker_id')) {
+      context.handle(
+        _brandMakerIdMeta,
+        brandMakerId.isAcceptableOrUnknown(
+          data['brand_maker_id']!,
+          _brandMakerIdMeta,
+        ),
+      );
     }
     if (data.containsKey('lab_l')) {
       context.handle(
@@ -204,6 +225,10 @@ class $PaintColorsTable extends PaintColors
           data['${effectivePrefix}brand'],
         )!,
       ),
+      brandMakerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}brand_maker_id'],
+      ),
       labL: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}lab_l'],
@@ -255,6 +280,14 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
   /// Converted to [PaintBrand] enum in Dart via [PaintBrandConverter].
   final PaintBrand brand;
 
+  /// Optional product code/SKU from the brand maker.
+  ///
+  /// Examples: "vallejo_70926", "citadel_51-01", "reaper_09021"
+  ///
+  /// Used for identifying specific paints and cross-referencing between
+  /// paint databases. Nullable to support legacy paints without codes.
+  final String? brandMakerId;
+
   /// LAB Lightness component (0-100).
   ///
   /// - 0 = absolute black
@@ -300,6 +333,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
     required this.id,
     required this.name,
     required this.brand,
+    this.brandMakerId,
     required this.labL,
     required this.labA,
     required this.labB,
@@ -317,6 +351,9 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
         $PaintColorsTable.$converterbrand.toSql(brand),
       );
     }
+    if (!nullToAbsent || brandMakerId != null) {
+      map['brand_maker_id'] = Variable<String>(brandMakerId);
+    }
     map['lab_l'] = Variable<double>(labL);
     map['lab_a'] = Variable<double>(labA);
     map['lab_b'] = Variable<double>(labB);
@@ -333,6 +370,9 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
       id: Value(id),
       name: Value(name),
       brand: Value(brand),
+      brandMakerId: brandMakerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(brandMakerId),
       labL: Value(labL),
       labA: Value(labA),
       labB: Value(labB),
@@ -353,6 +393,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       brand: serializer.fromJson<PaintBrand>(json['brand']),
+      brandMakerId: serializer.fromJson<String?>(json['brandMakerId']),
       labL: serializer.fromJson<double>(json['labL']),
       labA: serializer.fromJson<double>(json['labA']),
       labB: serializer.fromJson<double>(json['labB']),
@@ -368,6 +409,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'brand': serializer.toJson<PaintBrand>(brand),
+      'brandMakerId': serializer.toJson<String?>(brandMakerId),
       'labL': serializer.toJson<double>(labL),
       'labA': serializer.toJson<double>(labA),
       'labB': serializer.toJson<double>(labB),
@@ -381,6 +423,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
     int? id,
     String? name,
     PaintBrand? brand,
+    Value<String?> brandMakerId = const Value.absent(),
     double? labL,
     double? labA,
     double? labB,
@@ -391,6 +434,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
     id: id ?? this.id,
     name: name ?? this.name,
     brand: brand ?? this.brand,
+    brandMakerId: brandMakerId.present ? brandMakerId.value : this.brandMakerId,
     labL: labL ?? this.labL,
     labA: labA ?? this.labA,
     labB: labB ?? this.labB,
@@ -403,6 +447,9 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       brand: data.brand.present ? data.brand.value : this.brand,
+      brandMakerId: data.brandMakerId.present
+          ? data.brandMakerId.value
+          : this.brandMakerId,
       labL: data.labL.present ? data.labL.value : this.labL,
       labA: data.labA.present ? data.labA.value : this.labA,
       labB: data.labB.present ? data.labB.value : this.labB,
@@ -418,6 +465,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('brand: $brand, ')
+          ..write('brandMakerId: $brandMakerId, ')
           ..write('labL: $labL, ')
           ..write('labA: $labA, ')
           ..write('labB: $labB, ')
@@ -429,8 +477,18 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, brand, labL, labA, labB, addedAt, updatedAt, notes);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    brand,
+    brandMakerId,
+    labL,
+    labA,
+    labB,
+    addedAt,
+    updatedAt,
+    notes,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -438,6 +496,7 @@ class PaintColor extends DataClass implements Insertable<PaintColor> {
           other.id == this.id &&
           other.name == this.name &&
           other.brand == this.brand &&
+          other.brandMakerId == this.brandMakerId &&
           other.labL == this.labL &&
           other.labA == this.labA &&
           other.labB == this.labB &&
@@ -450,6 +509,7 @@ class PaintColorsCompanion extends UpdateCompanion<PaintColor> {
   final Value<int> id;
   final Value<String> name;
   final Value<PaintBrand> brand;
+  final Value<String?> brandMakerId;
   final Value<double> labL;
   final Value<double> labA;
   final Value<double> labB;
@@ -460,6 +520,7 @@ class PaintColorsCompanion extends UpdateCompanion<PaintColor> {
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.brand = const Value.absent(),
+    this.brandMakerId = const Value.absent(),
     this.labL = const Value.absent(),
     this.labA = const Value.absent(),
     this.labB = const Value.absent(),
@@ -471,6 +532,7 @@ class PaintColorsCompanion extends UpdateCompanion<PaintColor> {
     this.id = const Value.absent(),
     required String name,
     required PaintBrand brand,
+    this.brandMakerId = const Value.absent(),
     required double labL,
     required double labA,
     required double labB,
@@ -486,6 +548,7 @@ class PaintColorsCompanion extends UpdateCompanion<PaintColor> {
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? brand,
+    Expression<String>? brandMakerId,
     Expression<double>? labL,
     Expression<double>? labA,
     Expression<double>? labB,
@@ -497,6 +560,7 @@ class PaintColorsCompanion extends UpdateCompanion<PaintColor> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (brand != null) 'brand': brand,
+      if (brandMakerId != null) 'brand_maker_id': brandMakerId,
       if (labL != null) 'lab_l': labL,
       if (labA != null) 'lab_a': labA,
       if (labB != null) 'lab_b': labB,
@@ -510,6 +574,7 @@ class PaintColorsCompanion extends UpdateCompanion<PaintColor> {
     Value<int>? id,
     Value<String>? name,
     Value<PaintBrand>? brand,
+    Value<String?>? brandMakerId,
     Value<double>? labL,
     Value<double>? labA,
     Value<double>? labB,
@@ -521,6 +586,7 @@ class PaintColorsCompanion extends UpdateCompanion<PaintColor> {
       id: id ?? this.id,
       name: name ?? this.name,
       brand: brand ?? this.brand,
+      brandMakerId: brandMakerId ?? this.brandMakerId,
       labL: labL ?? this.labL,
       labA: labA ?? this.labA,
       labB: labB ?? this.labB,
@@ -543,6 +609,9 @@ class PaintColorsCompanion extends UpdateCompanion<PaintColor> {
       map['brand'] = Variable<String>(
         $PaintColorsTable.$converterbrand.toSql(brand.value),
       );
+    }
+    if (brandMakerId.present) {
+      map['brand_maker_id'] = Variable<String>(brandMakerId.value);
     }
     if (labL.present) {
       map['lab_l'] = Variable<double>(labL.value);
@@ -571,6 +640,7 @@ class PaintColorsCompanion extends UpdateCompanion<PaintColor> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('brand: $brand, ')
+          ..write('brandMakerId: $brandMakerId, ')
           ..write('labL: $labL, ')
           ..write('labA: $labA, ')
           ..write('labB: $labB, ')
@@ -601,6 +671,7 @@ typedef $$PaintColorsTableCreateCompanionBuilder =
       Value<int> id,
       required String name,
       required PaintBrand brand,
+      Value<String?> brandMakerId,
       required double labL,
       required double labA,
       required double labB,
@@ -613,6 +684,7 @@ typedef $$PaintColorsTableUpdateCompanionBuilder =
       Value<int> id,
       Value<String> name,
       Value<PaintBrand> brand,
+      Value<String?> brandMakerId,
       Value<double> labL,
       Value<double> labA,
       Value<double> labB,
@@ -645,6 +717,11 @@ class $$PaintColorsTableFilterComposer
         column: $table.brand,
         builder: (column) => ColumnWithTypeConverterFilters(column),
       );
+
+  ColumnFilters<String> get brandMakerId => $composableBuilder(
+    column: $table.brandMakerId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<double> get labL => $composableBuilder(
     column: $table.labL,
@@ -701,6 +778,11 @@ class $$PaintColorsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get brandMakerId => $composableBuilder(
+    column: $table.brandMakerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<double> get labL => $composableBuilder(
     column: $table.labL,
     builder: (column) => ColumnOrderings(column),
@@ -749,6 +831,11 @@ class $$PaintColorsTableAnnotationComposer
 
   GeneratedColumnWithTypeConverter<PaintBrand, String> get brand =>
       $composableBuilder(column: $table.brand, builder: (column) => column);
+
+  GeneratedColumn<String> get brandMakerId => $composableBuilder(
+    column: $table.brandMakerId,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<double> get labL =>
       $composableBuilder(column: $table.labL, builder: (column) => column);
@@ -803,6 +890,7 @@ class $$PaintColorsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<PaintBrand> brand = const Value.absent(),
+                Value<String?> brandMakerId = const Value.absent(),
                 Value<double> labL = const Value.absent(),
                 Value<double> labA = const Value.absent(),
                 Value<double> labB = const Value.absent(),
@@ -813,6 +901,7 @@ class $$PaintColorsTableTableManager
                 id: id,
                 name: name,
                 brand: brand,
+                brandMakerId: brandMakerId,
                 labL: labL,
                 labA: labA,
                 labB: labB,
@@ -825,6 +914,7 @@ class $$PaintColorsTableTableManager
                 Value<int> id = const Value.absent(),
                 required String name,
                 required PaintBrand brand,
+                Value<String?> brandMakerId = const Value.absent(),
                 required double labL,
                 required double labA,
                 required double labB,
@@ -835,6 +925,7 @@ class $$PaintColorsTableTableManager
                 id: id,
                 name: name,
                 brand: brand,
+                brandMakerId: brandMakerId,
                 labL: labL,
                 labA: labA,
                 labB: labB,

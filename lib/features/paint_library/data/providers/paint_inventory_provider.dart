@@ -1,11 +1,11 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
-import 'package:paint_color_resolver/core/database/app_database.dart';
+import 'package:paint_color_resolver/core/database/app_database.dart' hide PaintColor;
 import 'package:paint_color_resolver/core/database/providers/database_provider.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
-import 'package:paint_color_resolver/shared/models/paint_color.dart'
-    hide PaintColor;
+import 'package:paint_color_resolver/features/paint_library/data/mappers/paint_color_mapper.dart';
+import 'package:paint_color_resolver/shared/models/paint_color.dart' hide PaintColorMapper;
 
 final _log = Logger('PaintInventory');
 
@@ -59,7 +59,8 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
 
     try {
       final dao = ref.read(paintColorsDaoProvider);
-      final paints = await dao.getAllPaints();
+      final dbPaints = await dao.getAllPaints();
+      final paints = PaintColorMapper.fromDatabaseList(dbPaints);
       _log.info('Loaded ${paints.length} paints from database');
       return paints;
     } catch (e, stackTrace) {
@@ -77,6 +78,7 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
   /// - **name**: Paint name (must not be empty)
   /// - **brand**: Paint manufacturer
   /// - **labColor**: Color in LAB color space
+  /// - **brandMakerId**: Optional product code/SKU (e.g., "vallejo_70926")
   /// - **notes**: Optional user notes
   ///
   /// ## Example:
@@ -85,6 +87,7 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
   ///   name: 'Goblin Green',
   ///   brand: PaintBrand.citadel,
   ///   labColor: LabColor(l: 45.0, a: -30.0, b: 50.0),
+  ///   brandMakerId: 'citadel_51-25',
   ///   notes: 'Classic Citadel green',
   /// );
   /// ```
@@ -97,6 +100,7 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
     required String name,
     required PaintBrand brand,
     required LabColor labColor,
+    String? brandMakerId,
     String? notes,
   }) async {
     // Validate inputs
@@ -117,6 +121,7 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
         labL: labColor.l,
         labA: labColor.a,
         labB: labColor.b,
+        brandMakerId: Value(brandMakerId),
         notes: Value(notes),
       );
 
@@ -125,7 +130,8 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
       _log.info('Successfully added paint with ID: $id');
 
       // Reload full inventory
-      return dao.getAllPaints();
+      final dbPaints = await dao.getAllPaints();
+      return PaintColorMapper.fromDatabaseList(dbPaints);
     });
   }
 
@@ -138,6 +144,7 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
   /// - **name**: Updated paint name
   /// - **brand**: Updated brand
   /// - **labColor**: Updated LAB color
+  /// - **brandMakerId**: Updated product code/SKU (optional)
   /// - **notes**: Updated notes (optional)
   ///
   /// ## Example:
@@ -147,6 +154,7 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
   ///   name: 'Blood Red (Updated)',
   ///   brand: PaintBrand.citadel,
   ///   labColor: LabColor(l: 40.0, a: 70.0, b: 60.0),
+  ///   brandMakerId: 'citadel_51-31',
   ///   notes: 'Reformulated version',
   /// );
   /// ```
@@ -159,6 +167,7 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
     required String name,
     required PaintBrand brand,
     required LabColor labColor,
+    String? brandMakerId,
     String? notes,
   }) async {
     // Validate inputs
@@ -185,6 +194,7 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
         labL: labColor.l,
         labA: labColor.a,
         labB: labColor.b,
+        brandMakerId: Value(brandMakerId),
         notes: Value(notes),
         updatedAt: DateTime.now(),
       );
@@ -198,7 +208,8 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
       _log.info('Successfully updated paint ID: $paintId');
 
       // Reload full inventory
-      return dao.getAllPaints();
+      final dbPaints = await dao.getAllPaints();
+      return PaintColorMapper.fromDatabaseList(dbPaints);
     });
   }
 
@@ -229,7 +240,8 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
       _log.info('Successfully removed paint ID: $paintId');
 
       // Reload full inventory
-      return dao.getAllPaints();
+      final dbPaints = await dao.getAllPaints();
+      return PaintColorMapper.fromDatabaseList(dbPaints);
     });
   }
 
@@ -247,7 +259,8 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final dao = ref.read(paintColorsDaoProvider);
-      final paints = await dao.getAllPaints();
+      final dbPaints = await dao.getAllPaints();
+      final paints = PaintColorMapper.fromDatabaseList(dbPaints);
       _log.info('Refreshed inventory: ${paints.length} paints');
       return paints;
     });

@@ -27,18 +27,20 @@ enum PaintBrand {
 /// Represents an individual paint color in the user's collection.
 ///
 /// Contains:
-/// - Unique identifier
+/// - Database identifier (auto-increment)
 /// - Paint name (e.g., "Red Gore", "Ultramarine Blue")
 /// - Brand/manufacturer
+/// - Optional brand maker ID (product code/SKU like "vallejo_70926")
 /// - LAB color space representation
 /// - Date added to collection
 ///
 /// ## Example:
 /// ```dart
 /// final paint = PaintColor(
-///   id: 'vallejo_70926',
-///   name: 'Red',
+///   id: 1,
+///   name: 'Red Gore',
 ///   brand: PaintBrand.vallejo,
+///   brandMakerId: 'vallejo_70926',
 ///   labColor: LabColor(l: 53.2, a: 80.1, b: 67.2),
 ///   addedAt: DateTime.now(),
 /// );
@@ -52,16 +54,24 @@ class PaintColor with PaintColorMappable {
     required this.brand,
     required this.labColor,
     required this.addedAt,
+    this.brandMakerId,
   });
 
-  /// Unique identifier for this paint.
-  final String id;
+  /// Unique database identifier for this paint (auto-increment).
+  final int id;
 
   /// Human-readable name of the paint.
   final String name;
 
   /// The brand/manufacturer of the paint.
   final PaintBrand brand;
+
+  /// Optional product code/SKU from the brand maker
+  /// (e.g., "vallejo_70926", "citadel_51-01").
+  ///
+  /// Used for identifying specific paints and cross-referencing
+  /// between paint databases.
+  final String? brandMakerId;
 
   /// The color represented in LAB color space.
   ///
@@ -73,5 +83,7 @@ class PaintColor with PaintColorMappable {
   final DateTime addedAt;
 
   @override
-  String toString() => 'PaintColor($name by ${brand.name}, $labColor)';
+  String toString() =>
+      'PaintColor($name by ${brand.name}'
+      '${brandMakerId != null ? ' ($brandMakerId)' : ''}, $labColor)';
 }

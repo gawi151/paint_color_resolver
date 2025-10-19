@@ -1,5 +1,14 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
+import 'package:paint_color_resolver/features/paint_library/data/providers/paint_inventory_provider.dart';
+import 'package:paint_color_resolver/shared/models/paint_color.dart';
+import 'package:paint_color_resolver/shared/widgets/paint_form.dart';
+
+final _log = Logger('AddPaintScreen');
 
 /// Add Paint screen - form for adding new paint to inventory.
 ///
@@ -18,8 +27,64 @@ import 'package:flutter/material.dart';
 /// - Pushes on top of paint library screen
 /// - Pops back after successful save
 @RoutePage()
-class AddPaintScreen extends StatelessWidget {
+class AddPaintScreen extends ConsumerStatefulWidget {
   const AddPaintScreen({super.key});
+
+  @override
+  ConsumerState<AddPaintScreen> createState() => _AddPaintScreenState();
+}
+
+class _AddPaintScreenState extends ConsumerState<AddPaintScreen> {
+  bool _isLoading = false;
+
+  Future<void> _handleSubmit(PaintFormData formData) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      _log.info('Adding paint: ${formData.name}');
+
+      // Call the provider notifier to add the paint
+      await ref.read(paintInventoryProvider.notifier).addPaint(
+            name: formData.name,
+            brand: formData.brand,
+            labColor: formData.labColor,
+            brandMakerId: formData.brandMakerId,
+          );
+
+      _log.info('Paint added successfully: ${formData.name}');
+
+      if (mounted) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Added ${formData.name}'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+
+        // Pop back to paint library screen
+        if (mounted) context.router.pop();
+      }
+    } on Exception catch (e, stackTrace) {
+      _log.severe('Failed to add paint', e, stackTrace);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error adding paint: $e'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,42 +93,14 @@ class AddPaintScreen extends StatelessWidget {
         title: const Text('Add Paint'),
         elevation: 0,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.add_circle, size: 64, color: Colors.grey),
-            const SizedBox(height: 16),
-            const Text(
-              'Add New Paint',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Form placeholder - implementation in progress',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: context.router.pop,
-                  child: const Text('Cancel'),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    // TODO(painter-inventory): Save paint to inventory
-                    //  via provider
-                    context.router.pop();
-                  },
-                  child: const Text('Save'),
-                ),
-              ],
-            ),
-          ],
-        ),
+      body: PaintForm(
+        allAvailableBrands: PaintBrand.values,
+        onSubmit: _handleSubmit,
+        submitLabel: 'Add Paint',
+        isLoading: _isLoading,
+        onCancel: () {
+          context.router.pop();
+        },
       ),
     );
   }

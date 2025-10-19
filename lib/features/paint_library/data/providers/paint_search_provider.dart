@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
-import 'package:paint_color_resolver/core/database/app_database.dart';
 import 'package:paint_color_resolver/features/paint_library/data/providers/paint_inventory_provider.dart';
+import 'package:paint_color_resolver/shared/models/paint_color.dart';
 
 final _searchLog = Logger('PaintSearch');
 

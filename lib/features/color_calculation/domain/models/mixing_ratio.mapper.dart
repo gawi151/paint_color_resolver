@@ -21,11 +21,8 @@ class MixingRatioMapper extends ClassMapperBase<MixingRatio> {
   @override
   final String id = 'MixingRatio';
 
-  static String _$paintId(MixingRatio v) => v.paintId;
-  static const Field<MixingRatio, String> _f$paintId = Field(
-    'paintId',
-    _$paintId,
-  );
+  static int _$paintId(MixingRatio v) => v.paintId;
+  static const Field<MixingRatio, int> _f$paintId = Field('paintId', _$paintId);
   static int _$percentage(MixingRatio v) => v.percentage;
   static const Field<MixingRatio, int> _f$percentage = Field(
     'percentage',
@@ -105,7 +102,7 @@ extension MixingRatioValueCopy<$R, $Out>
 
 abstract class MixingRatioCopyWith<$R, $In extends MixingRatio, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? paintId, int? percentage});
+  $R call({int? paintId, int? percentage});
   MixingRatioCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -118,7 +115,7 @@ class _MixingRatioCopyWithImpl<$R, $Out>
   late final ClassMapperBase<MixingRatio> $mapper =
       MixingRatioMapper.ensureInitialized();
   @override
-  $R call({String? paintId, int? percentage}) => $apply(
+  $R call({int? paintId, int? percentage}) => $apply(
     FieldCopyWithData({
       if (paintId != null) #paintId: paintId,
       if (percentage != null) #percentage: percentage,

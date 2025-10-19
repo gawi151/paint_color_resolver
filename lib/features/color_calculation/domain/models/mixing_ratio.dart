@@ -4,14 +4,15 @@ part 'mixing_ratio.mapper.dart';
 
 /// Represents the ratio of a single paint in a mix.
 ///
-/// Contains the paint identifier and its percentage contribution (0-100).
-/// For multi-paint mixes, the sum of all ratios must equal 100%.
+/// Contains the paint identifier (database ID) and its percentage
+/// contribution (0-100). For multi-paint mixes, the sum of all ratios
+/// must equal 100%.
 ///
 /// ## Example:
 /// ```dart
-/// final ratio1 = MixingRatio(paintId: 'vallejo_red', percentage: 70);
-/// final ratio2 = MixingRatio(paintId: 'vallejo_white', percentage: 30);
-/// // Mix: 70% red + 30% white = 100%
+/// final ratio1 = MixingRatio(paintId: 1, percentage: 70);
+/// final ratio2 = MixingRatio(paintId: 2, percentage: 30);
+/// // Mix: 70% paint#1 + 30% paint#2 = 100%
 /// ```
 @MappableClass()
 class MixingRatio with MixingRatioMappable {
@@ -32,10 +33,10 @@ class MixingRatio with MixingRatioMappable {
          'Percentage must be in 10% increments, got: $percentage',
        );
 
-  /// Unique identifier of the paint.
+  /// Database ID of the paint (from PaintColor.id).
   ///
-  /// This should reference a paint in the user's collection.
-  final String paintId;
+  /// References a paint in the user's collection by its auto-increment ID.
+  final int paintId;
 
   /// Percentage of this paint in the mix (0-100).
   ///
@@ -43,5 +44,5 @@ class MixingRatio with MixingRatioMappable {
   final int percentage;
 
   @override
-  String toString() => 'MixingRatio($paintId: $percentage%)';
+  String toString() => 'MixingRatio(paint#$paintId: $percentage%)';
 }

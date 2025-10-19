@@ -7,7 +7,8 @@
       "Bash(flutter analyze:*)",
       "Bash(dart format:*)",
       "Bash(flutter pub:*)",
-      "Bash(flutter test:*)"
+      "Bash(flutter test:*)",
+      "Bash(dart analyze)"
     ]
   },
   "enabledMcpjsonServers": [

@@ -10,90 +10,100 @@ class TestPaintColors {
 
   /// Vallejo Red - Bright primary red
   static final vallejoRed = PaintColor(
-    id: 'vallejo_70926',
+    id: 1,
     name: 'Red',
     brand: PaintBrand.vallejo,
+    brandMakerId: 'vallejo_70926',
     labColor: const LabColor(l: 45.2, a: 68.4, b: 55.1),
     addedAt: DateTime(2024),
   );
 
   /// Vallejo Blue - Deep blue
   static final vallejoBlue = PaintColor(
-    id: 'vallejo_70925',
+    id: 2,
     name: 'Blue',
     brand: PaintBrand.vallejo,
+    brandMakerId: 'vallejo_70925',
     labColor: const LabColor(l: 28.5, a: 15.2, b: -52.8),
     addedAt: DateTime(2024),
   );
 
   /// Vallejo Yellow - Bright yellow
   static final vallejoYellow = PaintColor(
-    id: 'vallejo_70948',
+    id: 3,
     name: 'Yellow',
     brand: PaintBrand.vallejo,
+    brandMakerId: 'vallejo_70948',
     labColor: const LabColor(l: 92.1, a: -15.3, b: 88.2),
     addedAt: DateTime(2024),
   );
 
   /// Vallejo White - Pure white
   static final vallejoWhite = PaintColor(
-    id: 'vallejo_70951',
+    id: 4,
     name: 'White',
     brand: PaintBrand.vallejo,
+    brandMakerId: 'vallejo_70951',
     labColor: const LabColor(l: 98.5, a: 0.2, b: -0.1),
     addedAt: DateTime(2024),
   );
 
   /// Vallejo Black - Deep black
   static final vallejoBlack = PaintColor(
-    id: 'vallejo_70950',
+    id: 5,
     name: 'Black',
     brand: PaintBrand.vallejo,
+    brandMakerId: 'vallejo_70950',
     labColor: const LabColor(l: 5.2, a: 0.1, b: -0.2),
     addedAt: DateTime(2024),
   );
 
   /// Vallejo Flat Earth - Medium brown
   static final vallejoFlatEarth = PaintColor(
-    id: 'vallejo_70983',
+    id: 6,
     name: 'Flat Earth',
     brand: PaintBrand.vallejo,
+    brandMakerId: 'vallejo_70983',
     labColor: const LabColor(l: 38.7, a: 8.3, b: 22.5),
     addedAt: DateTime(2024),
   );
 
   /// Vallejo German Camo Beige - Light tan
   static final vallejoGermanCamoBeige = PaintColor(
-    id: 'vallejo_70821',
+    id: 7,
     name: 'German Camo Beige',
     brand: PaintBrand.vallejo,
+    brandMakerId: 'vallejo_70821',
     labColor: const LabColor(l: 68.4, a: 5.2, b: 28.9),
     addedAt: DateTime(2024),
   );
 
   /// Vallejo Orange - Vivid orange
   static final vallejoOrange = PaintColor(
-    id: 'vallejo_70733',
+    id: 8,
     name: 'Orange',
     brand: PaintBrand.vallejo,
+    brandMakerId: 'vallejo_70733',
     labColor: const LabColor(l: 62.8, a: 38.7, b: 68.3),
     addedAt: DateTime(2024),
   );
 
   /// Vallejo Green - Medium green
   static final vallejoGreen = PaintColor(
-    id: 'vallejo_70968',
+    id: 9,
     name: 'Green',
     brand: PaintBrand.vallejo,
+    brandMakerId: 'vallejo_70968',
     labColor: const LabColor(l: 52.3, a: -35.8, b: 28.4),
     addedAt: DateTime(2024),
   );
 
   /// Vallejo Purple - Deep purple
   static final vallejoPurple = PaintColor(
-    id: 'vallejo_70960',
+    id: 10,
     name: 'Purple',
     brand: PaintBrand.vallejo,
+    brandMakerId: 'vallejo_70960',
     labColor: const LabColor(l: 32.5, a: 48.2, b: -38.7),
     addedAt: DateTime(2024),
   );
@@ -116,13 +126,17 @@ class TestPaintColors {
   /// Creates duplicates with slight variations for testing purposes
   static List<PaintColor> get mediumCollection {
     final paints = <PaintColor>[];
+    var id = 11;
     for (var i = 0; i < 5; i++) {
       for (final paint in smallCollection) {
         paints.add(
           PaintColor(
-            id: '${paint.id}_var$i',
+            id: id++,
             name: '${paint.name} Variant $i',
             brand: paint.brand,
+            brandMakerId: paint.brandMakerId != null
+                ? '${paint.brandMakerId}_var$i'
+                : null,
             labColor: LabColor(
               l: (paint.labColor.l + i * 2).clamp(0.0, 100.0),
               a: (paint.labColor.a + i * 0.5).clamp(-128.0, 127.0),

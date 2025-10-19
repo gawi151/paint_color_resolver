@@ -11,6 +11,7 @@ import 'package:paint_color_resolver/shared/models/paint_color.dart';
 /// - **id**: Auto-increment primary key
 /// - **name**: Paint name (e.g., "Red Gore", "Ultramarine Blue")
 /// - **brand**: Paint manufacturer (stored as enum name)
+/// - **brandMakerId**: Optional product code/SKU (e.g., "vallejo_70926")
 /// - **labL**: LAB Lightness value (0-100)
 /// - **labA**: LAB a* component (green-red axis, -128 to 127)
 /// - **labB**: LAB b* component (blue-yellow axis, -128 to 127)
@@ -58,6 +59,14 @@ class PaintColors extends Table {
   /// Stored as enum name string (e.g., "vallejo", "citadel").
   /// Converted to [PaintBrand] enum in Dart via [PaintBrandConverter].
   TextColumn get brand => text().map(const PaintBrandConverter())();
+
+  /// Optional product code/SKU from the brand maker.
+  ///
+  /// Examples: "vallejo_70926", "citadel_51-01", "reaper_09021"
+  ///
+  /// Used for identifying specific paints and cross-referencing between
+  /// paint databases. Nullable to support legacy paints without codes.
+  TextColumn get brandMakerId => text().nullable()();
 
   /// LAB Lightness component (0-100).
   ///

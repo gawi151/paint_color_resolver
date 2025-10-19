@@ -22,8 +22,8 @@ class PaintColorMapper extends ClassMapperBase<PaintColor> {
   @override
   final String id = 'PaintColor';
 
-  static String _$id(PaintColor v) => v.id;
-  static const Field<PaintColor, String> _f$id = Field('id', _$id);
+  static int _$id(PaintColor v) => v.id;
+  static const Field<PaintColor, int> _f$id = Field('id', _$id);
   static String _$name(PaintColor v) => v.name;
   static const Field<PaintColor, String> _f$name = Field('name', _$name);
   static PaintBrand _$brand(PaintColor v) => v.brand;
@@ -38,6 +38,12 @@ class PaintColorMapper extends ClassMapperBase<PaintColor> {
     'addedAt',
     _$addedAt,
   );
+  static String? _$brandMakerId(PaintColor v) => v.brandMakerId;
+  static const Field<PaintColor, String> _f$brandMakerId = Field(
+    'brandMakerId',
+    _$brandMakerId,
+    opt: true,
+  );
 
   @override
   final MappableFields<PaintColor> fields = const {
@@ -46,6 +52,7 @@ class PaintColorMapper extends ClassMapperBase<PaintColor> {
     #brand: _f$brand,
     #labColor: _f$labColor,
     #addedAt: _f$addedAt,
+    #brandMakerId: _f$brandMakerId,
   };
 
   static PaintColor _instantiate(DecodingData data) {
@@ -55,6 +62,7 @@ class PaintColorMapper extends ClassMapperBase<PaintColor> {
       brand: data.dec(_f$brand),
       labColor: data.dec(_f$labColor),
       addedAt: data.dec(_f$addedAt),
+      brandMakerId: data.dec(_f$brandMakerId),
     );
   }
 
@@ -120,11 +128,12 @@ abstract class PaintColorCopyWith<$R, $In extends PaintColor, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
   LabColorCopyWith<$R, LabColor, LabColor> get labColor;
   $R call({
-    String? id,
+    int? id,
     String? name,
     PaintBrand? brand,
     LabColor? labColor,
     DateTime? addedAt,
+    String? brandMakerId,
   });
   PaintColorCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -142,11 +151,12 @@ class _PaintColorCopyWithImpl<$R, $Out>
       $value.labColor.copyWith.$chain((v) => call(labColor: v));
   @override
   $R call({
-    String? id,
+    int? id,
     String? name,
     PaintBrand? brand,
     LabColor? labColor,
     DateTime? addedAt,
+    Object? brandMakerId = $none,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -154,6 +164,7 @@ class _PaintColorCopyWithImpl<$R, $Out>
       if (brand != null) #brand: brand,
       if (labColor != null) #labColor: labColor,
       if (addedAt != null) #addedAt: addedAt,
+      if (brandMakerId != $none) #brandMakerId: brandMakerId,
     }),
   );
   @override
@@ -163,6 +174,7 @@ class _PaintColorCopyWithImpl<$R, $Out>
     brand: data.get(#brand, or: $value.brand),
     labColor: data.get(#labColor, or: $value.labColor),
     addedAt: data.get(#addedAt, or: $value.addedAt),
+    brandMakerId: data.get(#brandMakerId, or: $value.brandMakerId),
   );
 
   @override
