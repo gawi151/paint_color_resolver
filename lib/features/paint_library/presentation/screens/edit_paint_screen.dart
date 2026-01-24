@@ -34,7 +34,7 @@ final _log = Logger('EditPaintScreen');
 /// - Pops back after successful save/delete
 @RoutePage()
 class EditPaintScreen extends ConsumerStatefulWidget {
-  const EditPaintScreen({required this.paintId, super.key});
+  const EditPaintScreen(@PathParam('paintId') this.paintId, {super.key});
 
   /// The ID of the paint being edited
   final int paintId;

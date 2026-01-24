@@ -27,6 +27,22 @@ class AddPaintRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [AppShellScreen]
+class AppShellRoute extends PageRouteInfo<void> {
+  const AppShellRoute({List<PageRouteInfo>? children})
+    : super(AppShellRoute.name, initialChildren: children);
+
+  static const String name = 'AppShellRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AppShellScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ColorMixerScreen]
 class ColorMixerRoute extends PageRouteInfo<void> {
   const ColorMixerRoute({List<PageRouteInfo>? children})
@@ -52,6 +68,7 @@ class EditPaintRoute extends PageRouteInfo<EditPaintRouteArgs> {
   }) : super(
          EditPaintRoute.name,
          args: EditPaintRouteArgs(paintId: paintId, key: key),
+         rawPathParams: {'paintId': paintId},
          initialChildren: children,
        );
 
@@ -60,8 +77,11 @@ class EditPaintRoute extends PageRouteInfo<EditPaintRouteArgs> {
   static PageInfo page = PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<EditPaintRouteArgs>();
-      return EditPaintScreen(paintId: args.paintId, key: args.key);
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<EditPaintRouteArgs>(
+        orElse: () => EditPaintRouteArgs(paintId: pathParams.getInt('paintId')),
+      );
+      return EditPaintScreen(args.paintId, key: args.key);
     },
   );
 }

@@ -70,10 +70,6 @@ class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
     unawaited(context.router.push(const AddPaintRoute()));
   }
 
-  void _navigateToColorMixer() {
-    unawaited(context.router.push(const ColorMixerRoute()));
-  }
-
   Future<void> _showDeleteConfirmation({
     required int paintId,
     required String paintName,
@@ -120,15 +116,6 @@ class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
       appBar: AppBar(
         title: const Text('Paint Inventory'),
         elevation: 0,
-        actions: [
-          Tooltip(
-            message: 'Mix Colors',
-            child: IconButton(
-              icon: const Icon(Icons.palette),
-              onPressed: _navigateToColorMixer,
-            ),
-          ),
-        ],
       ),
       body: Column(
         children: [

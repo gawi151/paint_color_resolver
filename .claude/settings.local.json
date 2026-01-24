@@ -1,17 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:github.com)",
-      "Bash(dart fix:*)",
-      "Bash(dart run build_runner:*)",
-      "Bash(flutter analyze:*)",
-      "Bash(dart format:*)",
-      "Bash(flutter pub:*)",
-      "Bash(flutter test:*)",
-      "Bash(dart analyze)"
+      "Bash(dart run build_runner build:*)"
     ]
-  },
-  "enabledMcpjsonServers": [
-    "dart-flutter"
-  ]
+  }
 }

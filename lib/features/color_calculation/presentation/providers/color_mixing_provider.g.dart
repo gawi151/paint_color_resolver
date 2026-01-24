@@ -705,7 +705,7 @@ final class MixingResultsSortProvider
   }
 }
 
-String _$mixingResultsSortHash() => r'6398af9685d05dd12e892d1129bec6886e7e9985';
+String _$mixingResultsSortHash() => r'13b37b104702a53ee77f73146c0a42edd852ee45';
 
 /// State holder for UI filters (sorting, etc.)
 

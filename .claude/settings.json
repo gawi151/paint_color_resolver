@@ -67,9 +67,15 @@
             "Write(./android/app/src/main/AndroidManifest.xml)",
             "Bash(flutter :*)",
             "Bash(dart :*)",
-            "Bash(puro :*)"
+            "Bash(puro :*)",
+            "Bash(puro flutter:*)",
+            "Bash(puro dart:*)"
         ]
     },
+    "enabledMcpjsonServers": [
+        "dart-flutter"
+    ],
+    "enableAllProjectMcpServers": true,
     "hooks": {
         "PostToolUse": [
             {
