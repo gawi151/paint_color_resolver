@@ -24,7 +24,7 @@ part of 'color_mixing_provider.dart';
 /// ```
 
 @ProviderFor(TargetColor)
-const targetColorProvider = TargetColorProvider._();
+final targetColorProvider = TargetColorProvider._();
 
 /// Provider for the selected target color that the user wants to match.
 ///
@@ -56,7 +56,7 @@ final class TargetColorProvider
   /// // Update the target color
   /// ref.read(targetColorProvider.notifier).setTargetColor(newColor);
   /// ```
-  const TargetColorProvider._()
+  TargetColorProvider._()
     : super(
         from: null,
         argument: null,
@@ -105,7 +105,6 @@ abstract class _$TargetColor extends $Notifier<LabColor?> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<LabColor?, LabColor?>;
     final element =
         ref.element
@@ -115,7 +114,7 @@ abstract class _$TargetColor extends $Notifier<LabColor?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
@@ -131,7 +130,7 @@ abstract class _$TargetColor extends $Notifier<LabColor?> {
 /// ```
 
 @ProviderFor(NumberOfPaints)
-const numberOfPaintsProvider = NumberOfPaintsProvider._();
+final numberOfPaintsProvider = NumberOfPaintsProvider._();
 
 /// Provider for the number of paints to mix (1, 2, or 3).
 ///
@@ -155,7 +154,7 @@ final class NumberOfPaintsProvider
   /// final numberOfPaints = ref.watch(numberOfPaintsProvider);
   /// ref.read(numberOfPaintsProvider.notifier).state = 3; // Mix 3 paints
   /// ```
-  const NumberOfPaintsProvider._()
+  NumberOfPaintsProvider._()
     : super(
         from: null,
         argument: null,
@@ -200,7 +199,6 @@ abstract class _$NumberOfPaints extends $Notifier<int> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<int, int>;
     final element =
         ref.element
@@ -210,7 +208,7 @@ abstract class _$NumberOfPaints extends $Notifier<int> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
@@ -226,7 +224,7 @@ abstract class _$NumberOfPaints extends $Notifier<int> {
 /// - Greater than 10.0: Poor matches (usually avoided)
 
 @ProviderFor(MaxDeltaEThreshold)
-const maxDeltaEThresholdProvider = MaxDeltaEThresholdProvider._();
+final maxDeltaEThresholdProvider = MaxDeltaEThresholdProvider._();
 
 /// Provider for the maximum Delta E threshold for filtering results.
 ///
@@ -250,7 +248,7 @@ final class MaxDeltaEThresholdProvider
   /// - 2.0-5.0: Good matches (recommended)
   /// - 5.0-10.0: Acceptable matches
   /// - Greater than 10.0: Poor matches (usually avoided)
-  const MaxDeltaEThresholdProvider._()
+  MaxDeltaEThresholdProvider._()
     : super(
         from: null,
         argument: null,
@@ -296,7 +294,6 @@ abstract class _$MaxDeltaEThreshold extends $Notifier<double> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<double, double>;
     final element =
         ref.element
@@ -306,7 +303,7 @@ abstract class _$MaxDeltaEThreshold extends $Notifier<double> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
@@ -348,7 +345,7 @@ abstract class _$MaxDeltaEThreshold extends $Notifier<double> {
 /// ```
 
 @ProviderFor(mixingResults)
-const mixingResultsProvider = MixingResultsProvider._();
+final mixingResultsProvider = MixingResultsProvider._();
 
 /// Async provider that calculates the best paint mixing recommendations.
 ///
@@ -433,7 +430,7 @@ final class MixingResultsProvider
   ///   },
   /// )
   /// ```
-  const MixingResultsProvider._()
+  MixingResultsProvider._()
     : super(
         from: null,
         argument: null,
@@ -475,7 +472,7 @@ String _$mixingResultsHash() => r'4f0cdd42449f34a565e966aafbf05319575ee4b6';
 /// ```
 
 @ProviderFor(bestMixingResult)
-const bestMixingResultProvider = BestMixingResultProvider._();
+final bestMixingResultProvider = BestMixingResultProvider._();
 
 /// Provider to get the best (top) mixing result.
 ///
@@ -510,7 +507,7 @@ final class BestMixingResultProvider
   /// ```dart
   /// final bestMix = ref.watch(bestMixingResultProvider);
   /// ```
-  const BestMixingResultProvider._()
+  BestMixingResultProvider._()
     : super(
         from: null,
         argument: null,
@@ -544,7 +541,7 @@ String _$bestMixingResultHash() => r'6000a8464f6c9dd90104ea61e1421b8a5d6f6a11';
 /// "acceptable or better" matches.
 
 @ProviderFor(QualityFilterEnabled)
-const qualityFilterEnabledProvider = QualityFilterEnabledProvider._();
+final qualityFilterEnabledProvider = QualityFilterEnabledProvider._();
 
 /// Filter for viewing results by quality threshold.
 ///
@@ -556,7 +553,7 @@ final class QualityFilterEnabledProvider
   ///
   /// Allows users to toggle between viewing all results or just
   /// "acceptable or better" matches.
-  const QualityFilterEnabledProvider._()
+  QualityFilterEnabledProvider._()
     : super(
         from: null,
         argument: null,
@@ -596,7 +593,6 @@ abstract class _$QualityFilterEnabled extends $Notifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -606,7 +602,7 @@ abstract class _$QualityFilterEnabled extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
@@ -617,7 +613,7 @@ abstract class _$QualityFilterEnabled extends $Notifier<bool> {
 /// better.
 
 @ProviderFor(filteredMixingResults)
-const filteredMixingResultsProvider = FilteredMixingResultsProvider._();
+final filteredMixingResultsProvider = FilteredMixingResultsProvider._();
 
 /// Filtered mixing results based on quality threshold.
 ///
@@ -640,7 +636,7 @@ final class FilteredMixingResultsProvider
   /// Returns results filtered by quality if the quality filter is enabled.
   /// This provides a simpler view for users who only want "good" matches or
   /// better.
-  const FilteredMixingResultsProvider._()
+  FilteredMixingResultsProvider._()
     : super(
         from: null,
         argument: null,
@@ -672,13 +668,13 @@ String _$filteredMixingResultsHash() =>
 /// State holder for UI filters (sorting, etc.)
 
 @ProviderFor(MixingResultsSort)
-const mixingResultsSortProvider = MixingResultsSortProvider._();
+final mixingResultsSortProvider = MixingResultsSortProvider._();
 
 /// State holder for UI filters (sorting, etc.)
 final class MixingResultsSortProvider
     extends $NotifierProvider<MixingResultsSort, MixingSortOption> {
   /// State holder for UI filters (sorting, etc.)
-  const MixingResultsSortProvider._()
+  MixingResultsSortProvider._()
     : super(
         from: null,
         argument: null,
@@ -714,7 +710,6 @@ abstract class _$MixingResultsSort extends $Notifier<MixingSortOption> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<MixingSortOption, MixingSortOption>;
     final element =
         ref.element
@@ -724,14 +719,14 @@ abstract class _$MixingResultsSort extends $Notifier<MixingSortOption> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 /// Sorted mixing results based on user preference
 
 @ProviderFor(sortedMixingResults)
-const sortedMixingResultsProvider = SortedMixingResultsProvider._();
+final sortedMixingResultsProvider = SortedMixingResultsProvider._();
 
 /// Sorted mixing results based on user preference
 
@@ -746,7 +741,7 @@ final class SortedMixingResultsProvider
         $FutureModifier<List<MixingResult>>,
         $FutureProvider<List<MixingResult>> {
   /// Sorted mixing results based on user preference
-  const SortedMixingResultsProvider._()
+  SortedMixingResultsProvider._()
     : super(
         from: null,
         argument: null,

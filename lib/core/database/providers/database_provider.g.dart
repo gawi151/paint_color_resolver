@@ -36,7 +36,7 @@ part of 'database_provider.dart';
 /// ```
 
 @ProviderFor(database)
-const databaseProvider = DatabaseProvider._();
+final databaseProvider = DatabaseProvider._();
 
 /// Provides singleton instance of the Drift database.
 ///
@@ -94,7 +94,7 @@ final class DatabaseProvider
   ///   },
   /// )
   /// ```
-  const DatabaseProvider._()
+  DatabaseProvider._()
     : super(
         from: null,
         argument: null,
@@ -154,7 +154,7 @@ String _$databaseHash() => r'd7a35a83ad0e3d2e5c3a40b438bc9be186d6af93';
 /// ```
 
 @ProviderFor(paintColorsDao)
-const paintColorsDaoProvider = PaintColorsDaoProvider._();
+final paintColorsDaoProvider = PaintColorsDaoProvider._();
 
 /// Provides the PaintColorsDao for paint inventory operations.
 ///
@@ -206,7 +206,7 @@ final class PaintColorsDaoProvider
   ///   },
   /// )
   /// ```
-  const PaintColorsDaoProvider._()
+  PaintColorsDaoProvider._()
     : super(
         from: null,
         argument: null,
@@ -261,7 +261,7 @@ String _$paintColorsDaoHash() => r'1fa471b3e6740f3aa8d40ddd571eee6a3370f2b7';
 /// ```
 
 @ProviderFor(databaseInitialization)
-const databaseInitializationProvider = DatabaseInitializationProvider._();
+final databaseInitializationProvider = DatabaseInitializationProvider._();
 
 /// Ensures the database is seeded with initial paint data on first run.
 ///
@@ -303,7 +303,7 @@ final class DatabaseInitializationProvider
   ///   await ref.watch(databaseInitializationProvider.future);
   /// }
   /// ```
-  const DatabaseInitializationProvider._()
+  DatabaseInitializationProvider._()
     : super(
         from: null,
         argument: null,
