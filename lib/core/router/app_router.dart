@@ -72,20 +72,20 @@ class AppRouter extends RootStackRouter {
     // Add paint - pushed on top of shell (not a child of shell)
     AutoRoute(
       page: AddPaintRoute.page,
-      path: 'paint-library/add',
+      path: '/paint-library/add',
     ),
 
     // Edit paint - pushed on top of shell (not a child of shell)
     AutoRoute(
       page: EditPaintRoute.page,
-      path: 'paint-library/edit/:paintId',
+      path: '/paint-library/edit/:paintId',
     ),
 
     // Mixing results - pushed on top of shell (not a child of shell)
     // This allows it to overlay the entire navigation structure
     AutoRoute(
       page: MixingResultsRoute.page,
-      path: 'mixing-results',
+      path: '/mixing-results',
     ),
   ];
 }
