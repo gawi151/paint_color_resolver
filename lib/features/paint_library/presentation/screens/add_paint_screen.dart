@@ -21,7 +21,7 @@ final _log = Logger('AddPaintScreen');
 ///
 /// State Management:
 /// - Uses `paintInventoryProvider.notifier.addPaint()` to persist
-/// - Converts color picker RGB → LAB using domain layer
+/// - Optimistic updates provide instant UI feedback
 ///
 /// Navigation:
 /// - Pushes on top of paint library screen
@@ -35,13 +35,7 @@ class AddPaintScreen extends ConsumerStatefulWidget {
 }
 
 class _AddPaintScreenState extends ConsumerState<AddPaintScreen> {
-  bool _isLoading = false;
-
   Future<void> _handleSubmit(PaintFormData formData) async {
-    setState(() {
-      _isLoading = true;
-    });
-
     try {
       _log.info('Adding paint: ${formData.name}');
 
@@ -67,7 +61,7 @@ class _AddPaintScreenState extends ConsumerState<AddPaintScreen> {
         );
 
         // Pop back to paint library screen
-        if (mounted) context.router.pop();
+        context.router.pop();
       }
     } on Exception catch (e, stackTrace) {
       _log.severe('Failed to add paint', e, stackTrace);
@@ -80,10 +74,6 @@ class _AddPaintScreenState extends ConsumerState<AddPaintScreen> {
             backgroundColor: Colors.red,
           ),
         );
-
-        setState(() {
-          _isLoading = false;
-        });
       }
     }
   }
@@ -99,7 +89,7 @@ class _AddPaintScreenState extends ConsumerState<AddPaintScreen> {
         allAvailableBrands: PaintBrand.values,
         onSubmit: _handleSubmit,
         submitLabel: 'Add Paint',
-        isLoading: _isLoading,
+        // Optimistic updates - no local loading state needed
         onCancel: () {
           context.router.pop();
         },

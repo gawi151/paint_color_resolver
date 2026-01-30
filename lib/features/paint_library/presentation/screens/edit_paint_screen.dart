@@ -44,28 +44,29 @@ class EditPaintScreen extends ConsumerStatefulWidget {
 }
 
 class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
-  bool _isLoading = false;
+  /// Gets the current paintId from RouteData.
+  /// Using RouteData ensures we always read the latest URL parameter value,
+  /// especially important when the URL changes manually in the browser.
+  int get _paintId => context.routeData.params.getInt('paintId');
 
   Future<void> _handleSubmit(PaintFormData formData) async {
-    setState(() {
-      _isLoading = true;
-    });
+    final paintId = _paintId;
 
     try {
-      _log.info('Updating paint ID ${widget.paintId}: ${formData.name}');
+      _log.info('Updating paint ID $paintId: ${formData.name}');
 
       // Call the provider notifier to edit the paint
       await ref
           .read(paintInventoryProvider.notifier)
           .editPaint(
-            paintId: widget.paintId,
+            paintId: paintId,
             name: formData.name,
             brand: formData.brand,
             labColor: formData.labColor,
             brandMakerId: formData.brandMakerId,
           );
 
-      _log.info('Paint updated successfully ID ${widget.paintId}');
+      _log.info('Paint updated successfully ID $paintId');
 
       if (mounted) {
         // Show success message
@@ -77,7 +78,7 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
         );
 
         // Pop back to paint library screen
-        if (mounted) context.router.pop();
+        context.router.pop();
       }
     } on Exception catch (e, stackTrace) {
       _log.severe('Failed to update paint', e, stackTrace);
@@ -90,15 +91,13 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
             backgroundColor: Colors.red,
           ),
         );
-
-        setState(() {
-          _isLoading = false;
-        });
       }
     }
   }
 
   Future<void> _handleDelete() async {
+    final paintId = _paintId;
+
     // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
@@ -126,21 +125,15 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
 
     if (confirmed != true) return;
 
-    setState(() {
-      _isLoading = true;
-    });
-
     try {
-      _log.info('Deleting paint ID ${widget.paintId}');
+      _log.info('Deleting paint ID $paintId');
 
       // Call the provider notifier to delete the paint
       await ref
           .read(paintInventoryProvider.notifier)
-          .removePaint(
-            widget.paintId,
-          );
+          .removePaint(paintId);
 
-      _log.info('Paint deleted successfully ID ${widget.paintId}');
+      _log.info('Paint deleted successfully ID $paintId');
 
       if (mounted) {
         // Show success message
@@ -152,7 +145,7 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
         );
 
         // Pop back to paint library screen
-        if (mounted) context.router.pop();
+        context.router.pop();
       }
     } on Exception catch (e, stackTrace) {
       _log.severe('Failed to delete paint', e, stackTrace);
@@ -165,16 +158,14 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
             backgroundColor: Colors.red,
           ),
         );
-
-        setState(() {
-          _isLoading = false;
-        });
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final paintId = _paintId;
+
     // Watch the paint inventory to find this specific paint
     final inventoryAsync = ref.watch(paintInventoryProvider);
 
@@ -184,26 +175,21 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
         elevation: 0,
         actions: [
           // Delete button in app bar
-          if (!_isLoading)
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
-              onPressed: _handleDelete,
-              tooltip: 'Delete paint',
-            ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            onPressed: _handleDelete,
+            tooltip: 'Delete paint',
+          ),
         ],
       ),
       body: inventoryAsync.when(
         data: (paints) {
-          // Find the paint by ID using where() to avoid StateError
-          final matchingPaints = paints
-              .where(
-                (p) => p.id == widget.paintId,
-              )
-              .toList();
+          // Find the paint by ID
+          final matchingPaints = paints.where((p) => p.id == paintId).toList();
           final paint = matchingPaints.isNotEmpty ? matchingPaints.first : null;
 
           if (paint == null) {
-            _log.warning('Paint ID ${widget.paintId} not found in inventory');
+            _log.warning('Paint ID $paintId not found in inventory');
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -238,7 +224,7 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
             allAvailableBrands: PaintBrand.values,
             onSubmit: _handleSubmit,
             submitLabel: 'Update Paint',
-            isLoading: _isLoading,
+            // Optimistic updates - no local loading state needed
             onCancel: () {
               context.router.pop();
             },

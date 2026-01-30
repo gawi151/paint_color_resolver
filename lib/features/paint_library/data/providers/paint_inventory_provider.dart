@@ -17,6 +17,8 @@ final _log = Logger('PaintInventory');
 ///
 /// ## State Management:
 /// - Uses AsyncNotifierProvider for async state with loading/error handling
+/// - Uses optimistic updates for instant UI feedback
+/// - Persists changes to database in the background
 /// - Automatically reloads inventory after mutations
 /// - Integrates with PaintColorsDao for database operations
 ///
@@ -52,7 +54,7 @@ final paintInventoryProvider =
       PaintInventoryNotifier.new,
     );
 
-/// Notifier for managing paint inventory state.
+/// Notifier for managing paint inventory state with optimistic updates.
 class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
   @override
   Future<List<PaintColor>> build() async {
@@ -70,10 +72,10 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
     }
   }
 
-  /// Adds a new paint to the inventory.
+  /// Adds a new paint to the inventory with optimistic update.
   ///
-  /// Validates inputs, creates the paint record, inserts into database,
-  /// and reloads the full inventory.
+  /// The UI updates immediately, then the paint is persisted to database.
+  /// If database insert fails, the optimistic update is reverted.
   ///
   /// ## Parameters:
   /// - **name**: Paint name (must not be empty)
@@ -95,8 +97,7 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
   ///
   /// ## Throws:
   /// - [ArgumentError] if name is empty
-  /// - [InvalidDataException] if LAB values are out of range
-  /// - Database exceptions on insert failure
+  /// - Database exceptions on insert failure (optimistic update is reverted)
   Future<void> addPaint({
     required String name,
     required PaintBrand brand,
@@ -111,8 +112,11 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
 
     _log.info('Adding paint: $name by ${brand.name}');
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
+    if (!state.hasValue) return;
+
+    final currentState = state.value!;
+
+    try {
       final dao = ref.read(paintColorsDaoProvider);
 
       // Create paint companion for insertion
@@ -126,19 +130,34 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
         notes: Value(notes),
       );
 
-      // Insert and get generated ID
+      // Insert to database first to get the generated ID
       final id = await dao.insertPaint(paintCompanion);
       _log.info('Successfully added paint with ID: $id');
 
-      // Reload full inventory
-      final dbPaints = await dao.getAllPaints();
-      return PaintColorMapper.fromDatabaseList(dbPaints);
-    });
+      // Optimistically update state with the new paint
+      final now = DateTime.now();
+      final newPaint = PaintColor(
+        id: id,
+        name: name.trim(),
+        brand: brand,
+        labColor: labColor,
+        brandMakerId: brandMakerId,
+        addedAt: now,
+      );
+
+      state = AsyncValue.data([...currentState, newPaint]);
+    } catch (e, stackTrace) {
+      _log.severe('Failed to add paint', e, stackTrace);
+      // State remains unchanged on error
+      state = AsyncValue.error(e, stackTrace);
+      rethrow;
+    }
   }
 
-  /// Edits an existing paint in the inventory.
+  /// Edits an existing paint in the inventory with optimistic update.
   ///
-  /// Updates the paint record with new values and reloads the inventory.
+  /// The UI updates immediately, then the change is persisted to database.
+  /// If database update fails, the optimistic update is reverted.
   ///
   /// ## Parameters:
   /// - **paintId**: ID of paint to edit
@@ -161,8 +180,8 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
   /// ```
   ///
   /// ## Throws:
-  /// - [ArgumentError] if name is empty
-  /// - Database exceptions if paint not found or update fails
+  /// - [ArgumentError] if name is empty or paint not found
+  /// - Database exceptions if update fails (optimistic update is reverted)
   Future<void> editPaint({
     required int paintId,
     required String name,
@@ -178,18 +197,45 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
 
     _log.info('Editing paint id=$paintId');
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
+    if (!state.hasValue) return;
+
+    final currentState = state.value!;
+
+    // Find the existing paint to preserve timestamps
+    final existingPaintIndex =
+        currentState.indexWhere((PaintColor p) => p.id == paintId);
+    if (existingPaintIndex == -1) {
+      throw ArgumentError('Paint with ID $paintId not found in state');
+    }
+
+    final existingPaint = currentState[existingPaintIndex];
+
+    // Create optimistically updated paint
+    final updatedPaint = PaintColor(
+      id: paintId,
+      name: name.trim(),
+      brand: brand,
+      labColor: labColor,
+      brandMakerId: brandMakerId,
+      addedAt: existingPaint.addedAt,
+    );
+
+    // Optimistically update state
+    final updatedList = <PaintColor>[...currentState];
+    updatedList[existingPaintIndex] = updatedPaint;
+    state = AsyncValue.data(updatedList);
+
+    try {
       final dao = ref.read(paintColorsDaoProvider);
 
-      // Get existing paint to preserve timestamps
-      final existingPaint = await dao.getPaintById(paintId);
-      if (existingPaint == null) {
-        throw ArgumentError('Paint with ID $paintId not found');
+      // Get existing paint from database to preserve timestamps
+      final dbPaint = await dao.getPaintById(paintId);
+      if (dbPaint == null) {
+        throw ArgumentError('Paint with ID $paintId not found in database');
       }
 
       // Create updated paint record
-      final updatedPaint = existingPaint.copyWith(
+      final dbUpdatedPaint = dbPaint.copyWith(
         name: name.trim(),
         brand: brand,
         labL: labColor.l,
@@ -201,22 +247,26 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
       );
 
       // Update in database
-      final success = await dao.updatePaint(updatedPaint);
+      final success = await dao.updatePaint(dbUpdatedPaint);
       if (!success) {
         throw Exception('Failed to update paint ID $paintId');
       }
 
       _log.info('Successfully updated paint ID: $paintId');
-
-      // Reload full inventory
-      final dbPaints = await dao.getAllPaints();
-      return PaintColorMapper.fromDatabaseList(dbPaints);
-    });
+      // State already updated optimistically, no need to change
+    } catch (e, stackTrace) {
+      _log.severe('Failed to edit paint', e, stackTrace);
+      // Revert optimistic update
+      state = AsyncValue.data(currentState);
+      state = AsyncValue.error(e, stackTrace);
+      rethrow;
+    }
   }
 
-  /// Removes a paint from the inventory.
+  /// Removes a paint from the inventory with optimistic update.
   ///
-  /// Deletes the paint record from the database and reloads the inventory.
+  /// The UI updates immediately, then the paint is deleted from database.
+  /// If database delete fails, the optimistic update is reverted.
   ///
   /// ## Example:
   /// ```dart
@@ -232,18 +282,38 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
   Future<void> removePaint(int paintId) async {
     _log.info('Removing paint id=$paintId');
 
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
+    if (!state.hasValue) return;
+
+    final currentState = state.value!;
+
+    // Find the paint to remove
+    final existingPaintIndex =
+        currentState.indexWhere((PaintColor p) => p.id == paintId);
+    if (existingPaintIndex == -1) {
+      _log.warning('Paint ID $paintId not found in state');
+      return;
+    }
+
+    // Optimistically remove from state
+    final updatedList = <PaintColor>[
+      ...currentState,
+    ]..removeAt(existingPaintIndex);
+    state = AsyncValue.data(updatedList);
+
+    try {
       final dao = ref.read(paintColorsDaoProvider);
 
       // Delete from database
       await dao.deletePaint(paintId);
       _log.info('Successfully removed paint ID: $paintId');
-
-      // Reload full inventory
-      final dbPaints = await dao.getAllPaints();
-      return PaintColorMapper.fromDatabaseList(dbPaints);
-    });
+      // State already updated optimistically, no need to change
+    } catch (e, stackTrace) {
+      _log.severe('Failed to remove paint', e, stackTrace);
+      // Revert optimistic update
+      state = AsyncValue.data(currentState);
+      state = AsyncValue.error(e, stackTrace);
+      rethrow;
+    }
   }
 
   /// Force reloads the paint inventory from the database.

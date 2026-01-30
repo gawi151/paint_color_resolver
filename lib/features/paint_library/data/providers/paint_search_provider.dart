@@ -8,43 +8,28 @@ final _searchLog = Logger('PaintSearch');
 
 /// Filters the paint inventory by search query and optional brand filter.
 ///
-/// This is a functional provider that watches the paint inventory and
-/// applies client-side filtering based on the provided parameters.
+/// This provider watches the paint inventory and applies client-side filtering.
+/// Returns AsyncValue to properly expose loading/error states from the inventory.
 ///
 /// ## Features:
 /// - Case-insensitive name search
 /// - Optional brand filtering
 /// - Automatically sorted by paint name
 /// - Reactive updates when inventory changes
+/// - Properly propagates loading/error states
 ///
 /// ## Usage in Widgets:
 /// ```dart
 /// Consumer(
 ///   builder: (context, ref, _) {
-///     // Search for "blue" paints
-///     final blueResults = ref.watch(
-///       paintSearchProvider(query: 'blue'),
+///     final searchAsync = ref.watch(
+///       paintSearchProvider(PaintSearchParams(query: 'blue')),
 ///     );
 ///
-///     // Filter by brand only
-///     final vallejoResults = ref.watch(
-///       paintSearchProvider(
-///         query: '',
-///         brandFilter: 'vallejo',
-///       ),
-///     );
-///
-///     // Combined search and brand filter
-///     final filteredResults = ref.watch(
-///       paintSearchProvider(
-///         query: 'red',
-///         brandFilter: 'citadel',
-///       ),
-///     );
-///
-///     return ListView.builder(
-///       itemCount: filteredResults.length,
-///       itemBuilder: (context, index) => Text(filteredResults[index].name),
+///     return searchAsync.when(
+///       data: (paints) => ListView.builder(...),
+///       loading: () => CircularProgressIndicator(),
+///       error: (error, stack) => Text('Error: $error'),
 ///     );
 ///   },
 /// )
@@ -56,7 +41,7 @@ final _searchLog = Logger('PaintSearch');
 /// - Provider automatically caches results per unique query/brand combination
 /// - Debounce search input in UI to reduce excessive provider calls
 final paintSearchProvider =
-    Provider.family<List<PaintColor>, PaintSearchParams>(
+    Provider.family<AsyncValue<List<PaintColor>>, PaintSearchParams>(
       (ref, params) {
         final inventoryAsync = ref.watch(paintInventoryProvider);
 
@@ -93,21 +78,19 @@ final paintSearchProvider =
             filtered.sort((a, b) => a.name.compareTo(b.name));
 
             _searchLog.fine('Filtered results: ${filtered.length} paints');
-            return filtered;
+            return AsyncValue.data(filtered);
           },
           loading: () {
-            _searchLog.fine(
-              'Inventory loading, returning empty search results',
-            );
-            return <PaintColor>[];
+            _searchLog.fine('Inventory loading, propagating loading state');
+            return const AsyncValue.loading();
           },
           error: (error, stackTrace) {
             _searchLog.warning(
-              'Inventory error, returning empty search results',
+              'Inventory error, propagating to UI',
               error,
               stackTrace,
             );
-            return <PaintColor>[];
+            return AsyncValue.error(error, stackTrace);
           },
         );
       },

@@ -76,9 +76,11 @@ class AppRouter extends RootStackRouter {
     ),
 
     // Edit paint - pushed on top of shell (not a child of shell)
+    // usesPathAsKey ensures each unique paintId triggers a rebuild
     AutoRoute(
       page: EditPaintRoute.page,
       path: '/paint-library/edit/:paintId',
+      usesPathAsKey: true,
     ),
 
     // Mixing results - pushed on top of shell (not a child of shell)

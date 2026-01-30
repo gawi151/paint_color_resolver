@@ -42,6 +42,7 @@ class PaintLibraryScreen extends ConsumerStatefulWidget {
 class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
   late TextEditingController _searchController;
   String _searchQuery = '';
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -52,13 +53,23 @@ class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
   void _onSearchChanged() {
-    setState(() {
-      _searchQuery = _searchController.text;
+    // Cancel previous timer
+    _debounce?.cancel();
+    // Start new timer - only update search query after user stops typing
+    _debounce = Timer(
+      const Duration(milliseconds: 300),
+      () {
+      if (mounted) {
+        setState(() {
+          _searchQuery = _searchController.text;
+        });
+      }
     });
   }
 
@@ -105,12 +116,9 @@ class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Watch the filtered search results
+    // Watch the filtered search results (includes loading/error states)
     final searchParams = PaintSearchParams(query: _searchQuery);
-    final searchResults = ref.watch(paintSearchProvider(searchParams));
-
-    // Also watch inventory for loading/error states
-    final inventoryAsync = ref.watch(paintInventoryProvider);
+    final searchResultsAsync = ref.watch(paintSearchProvider(searchParams));
 
     return Scaffold(
       appBar: AppBar(
@@ -131,7 +139,12 @@ class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
                     ? IconButton(
                         icon: const Icon(Icons.clear),
                         onPressed: () {
+                          // Cancel any pending debounce and clear immediately
+                          _debounce?.cancel();
                           _searchController.clear();
+                          setState(() {
+                            _searchQuery = '';
+                          });
                         },
                       )
                     : null,
@@ -148,8 +161,8 @@ class _PaintLibraryScreenState extends ConsumerState<PaintLibraryScreen> {
 
           // Paint list or empty state
           Expanded(
-            child: inventoryAsync.when(
-              data: (_) {
+            child: searchResultsAsync.when(
+              data: (searchResults) {
                 if (searchResults.isEmpty) {
                   return Center(
                     child: Column(
