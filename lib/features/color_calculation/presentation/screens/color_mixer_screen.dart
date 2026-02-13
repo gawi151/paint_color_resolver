@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart' show Material, Slider;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
@@ -32,6 +31,27 @@ class ColorMixerScreen extends ConsumerStatefulWidget {
 
 class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
   bool _isCalculating = false;
+  late final ShadSliderController _deltaEController;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialDeltaE = ref.read(maxDeltaEThresholdProvider);
+    _deltaEController = ShadSliderController(initialValue: initialDeltaE);
+
+    // Sync controller when provider changes externally (e.g. reset button)
+    ref.listenManual(maxDeltaEThresholdProvider, (_, next) {
+      if (_deltaEController.value != next) {
+        _deltaEController.value = next;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _deltaEController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -223,18 +243,15 @@ class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
           ],
         ),
         const SizedBox(height: 8),
-        Material(
-          child: Slider(
-            value: maxDeltaE,
-            min: 1,
-            max: 20,
-            divisions: 19,
-            label: maxDeltaE.toStringAsFixed(1),
-            onChanged: (value) {
-              ref.read(maxDeltaEThresholdProvider.notifier).setMaxDeltaE(value);
-              _log.fine('Set max Delta E to: $value');
-            },
-          ),
+        ShadSlider(
+          controller: _deltaEController,
+          min: 1,
+          max: 20,
+          divisions: 19,
+          onChanged: (value) {
+            ref.read(maxDeltaEThresholdProvider.notifier).setMaxDeltaE(value);
+            _log.fine('Set max Delta E to: $value');
+          },
         ),
         const SizedBox(height: 8),
         const Text(
