@@ -1,9 +1,3 @@
-import 'package:flutter/material.dart'
-    show
-        BottomNavigationBar,
-        BottomNavigationBarItem,
-        BottomNavigationBarType,
-        Material;
 import 'package:flutter/widgets.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -49,39 +43,99 @@ class ResponsiveBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: BottomNavigationBar(
-        currentIndex: activeIndex,
-        onTap: (index) {
-          if (index == 2) {
-            // More menu
-            onMoreTapped?.call();
-          } else {
-            // Tab navigation (Mixer or Library)
-            onTabChanged(index);
-          }
-        },
-        type: BottomNavigationBarType.fixed,
-        elevation: 8,
-        items: const [
-          // Tab 0: Color Mixer - Main mixing functionality
-          BottomNavigationBarItem(
-            icon: Icon(LucideIcons.palette),
-            label: 'Mixer',
-          ),
+    final theme = ShadTheme.of(context);
 
-          // Tab 1: Paint Library - Inventory management
-          BottomNavigationBarItem(
-            icon: Icon(LucideIcons.list),
-            label: 'Library',
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.card,
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.border,
           ),
-
-          // More - Settings and other options
-          BottomNavigationBarItem(
-            icon: Icon(LucideIcons.ellipsis),
-            label: 'More',
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.foreground.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
           ),
         ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(
+                context: context,
+                icon: LucideIcons.palette,
+                label: 'Mixer',
+                isActive: activeIndex == 0,
+                onTap: () => onTabChanged(0),
+              ),
+              _buildNavItem(
+                context: context,
+                icon: LucideIcons.list,
+                label: 'Library',
+                isActive: activeIndex == 1,
+                onTap: () => onTabChanged(1),
+              ),
+              _buildNavItem(
+                context: context,
+                icon: LucideIcons.ellipsis,
+                label: 'More',
+                isActive: activeIndex == 2,
+                onTap: () {
+                  if (onMoreTapped != null) {
+                    onMoreTapped!();
+                  } else {
+                    onTabChanged(2);
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    final theme = ShadTheme.of(context);
+
+    return Expanded(
+      child: ShadButton.ghost(
+        onPressed: onTap,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 24,
+              color: isActive
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.mutedForeground,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: theme.textTheme.small.copyWith(
+                color: isActive
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.mutedForeground,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
