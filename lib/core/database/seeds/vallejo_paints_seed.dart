@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' show Color;
+import 'dart:ui' show Color;
 import 'package:logging/logging.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/services/color_converter.dart';
 import 'package:paint_color_resolver/shared/models/paint_color.dart';
