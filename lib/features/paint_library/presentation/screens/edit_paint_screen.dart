@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart' hide TextButton;
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:paint_color_resolver/features/paint_library/data/providers/paint_inventory_provider.dart';
