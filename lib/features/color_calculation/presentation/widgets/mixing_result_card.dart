@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/mixing_result.dart';
@@ -6,6 +6,7 @@ import 'package:paint_color_resolver/features/color_calculation/domain/services/
 import 'package:paint_color_resolver/features/color_calculation/presentation/widgets/quality_badge.dart';
 import 'package:paint_color_resolver/features/paint_library/data/providers/paint_inventory_provider.dart';
 import 'package:paint_color_resolver/shared/models/paint_color.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// Card displaying a single mixing recommendation.
 ///
@@ -34,17 +35,16 @@ class MixingResultCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-      elevation: 2,
+    return ShadCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header with rank and quality
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: const BorderRadius.only(
+            decoration: const BoxDecoration(
+              color: Color(0xFFFAFAFA),
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(4),
                 topRight: Radius.circular(4),
               ),
@@ -59,13 +59,13 @@ class MixingResultCard extends ConsumerWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
+                    color: ShadTheme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     '#$index',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white,
+                    style: ShadTheme.of(context).textTheme.large.copyWith(
+                      color: const Color(0xFFFFFFFF),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -77,7 +77,7 @@ class MixingResultCard extends ConsumerWidget {
                   children: [
                     Text(
                       'ΔE: ${result.deltaE.toStringAsFixed(2)}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      style: ShadTheme.of(context).textTheme.large.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -97,8 +97,8 @@ class MixingResultCard extends ConsumerWidget {
               children: [
                 Text(
                   'Mix Formula',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey,
+                  style: ShadTheme.of(context).textTheme.small.copyWith(
+                    color: const Color(0xFF9E9E9E),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -110,10 +110,10 @@ class MixingResultCard extends ConsumerWidget {
           // Color swatches section
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+            decoration: const BoxDecoration(
+              color: Color(0xFFFAFAFA),
               border: Border(
-                top: BorderSide(color: Colors.grey.shade200),
+                top: BorderSide(color: Color(0xFFEEEEEE)),
               ),
             ),
             child: Row(
@@ -126,10 +126,9 @@ class MixingResultCard extends ConsumerWidget {
                       children: [
                         Text(
                           'Target',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: Colors.grey,
-                              ),
+                          style: ShadTheme.of(context).textTheme.small.copyWith(
+                            color: const Color(0xFF9E9E9E),
+                          ),
                         ),
                         const SizedBox(height: 8),
                         _buildColorSwatch(targetColor!),
@@ -146,8 +145,8 @@ class MixingResultCard extends ConsumerWidget {
                     children: [
                       Text(
                         'Result',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey,
+                        style: ShadTheme.of(context).textTheme.small.copyWith(
+                          color: const Color(0xFF9E9E9E),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -188,16 +187,16 @@ class MixingResultCard extends ConsumerWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withValues(
+                    color: ShadTheme.of(context).colorScheme.primary.withValues(
                       alpha: 0.1,
                     ),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     '${ratio.percentage}%',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    style: ShadTheme.of(context).textTheme.large.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
+                      color: ShadTheme.of(context).colorScheme.primary,
                     ),
                   ),
                 ),
@@ -211,7 +210,7 @@ class MixingResultCard extends ConsumerWidget {
                     margin: const EdgeInsets.only(right: 8),
                     decoration: BoxDecoration(
                       color: _getPaintDisplayColor(paint),
-                      border: Border.all(color: Colors.grey.shade300),
+                      border: Border.all(color: const Color(0xFFE0E0E0)),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -223,7 +222,7 @@ class MixingResultCard extends ConsumerWidget {
                     children: [
                       Text(
                         paint?.name ?? 'Unknown Paint',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        style: ShadTheme.of(context).textTheme.large.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -231,11 +230,10 @@ class MixingResultCard extends ConsumerWidget {
                       if (paint != null)
                         Text(
                           paint.brand.name.toUpperCase(),
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: Colors.grey,
-                                fontSize: 11,
-                              ),
+                          style: ShadTheme.of(context).textTheme.small.copyWith(
+                            color: const Color(0xFF9E9E9E),
+                            fontSize: 11,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                     ],
@@ -247,7 +245,7 @@ class MixingResultCard extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Text(
                     '+',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    style: ShadTheme.of(context).textTheme.large.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -269,7 +267,7 @@ class MixingResultCard extends ConsumerWidget {
       height: 60,
       decoration: BoxDecoration(
         color: rgbColor,
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: const Color(0xFFE0E0E0)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Center(
@@ -280,7 +278,7 @@ class MixingResultCard extends ConsumerWidget {
               'L:${labColor.l.toStringAsFixed(0)}',
               style: const TextStyle(
                 fontSize: 10,
-                color: Colors.white,
+                color: Color(0xFFFFFFFF),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -296,12 +294,12 @@ class MixingResultCard extends ConsumerWidget {
     final converter = ColorConverter();
     try {
       final labColorToConvert = labColor ?? paint?.labColor;
-      if (labColorToConvert == null) return Colors.grey.shade300;
+      if (labColorToConvert == null) return const Color(0xFFE0E0E0);
 
       return converter.labToRgb(labColorToConvert);
     } on Exception {
       // Fallback if conversion fails
-      return Colors.grey.shade300;
+      return const Color(0xFFE0E0E0);
     }
   }
 }

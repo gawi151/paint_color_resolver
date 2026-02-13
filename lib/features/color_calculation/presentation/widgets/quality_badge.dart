@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/color_match_quality.dart';
 
 /// Visual badge indicating the quality of a color match.
@@ -79,15 +79,15 @@ class QualityBadge extends StatelessWidget {
   Color _getBackgroundColor() {
     switch (quality) {
       case ColorMatchQuality.excellent:
-        return Colors.green.shade50;
+        return const Color(0xFFE8F5E9);
       case ColorMatchQuality.good:
-        return Colors.blue.shade50;
+        return const Color(0xFFE3F2FD);
       case ColorMatchQuality.acceptable:
-        return Colors.amber.shade50;
+        return const Color(0xFFFFF8E1);
       case ColorMatchQuality.poor:
-        return Colors.orange.shade50;
+        return const Color(0xFFFFF3E0);
       case ColorMatchQuality.veryPoor:
-        return Colors.red.shade50;
+        return const Color(0xFFFFEBEE);
     }
   }
 
@@ -95,15 +95,15 @@ class QualityBadge extends StatelessWidget {
   Color _getBorderColor() {
     switch (quality) {
       case ColorMatchQuality.excellent:
-        return Colors.green.shade400;
+        return const Color(0xFF66BB6A);
       case ColorMatchQuality.good:
-        return Colors.blue.shade400;
+        return const Color(0xFF42A5F5);
       case ColorMatchQuality.acceptable:
-        return Colors.amber.shade400;
+        return const Color(0xFFFFCA28);
       case ColorMatchQuality.poor:
-        return Colors.orange.shade400;
+        return const Color(0xFFFF9800);
       case ColorMatchQuality.veryPoor:
-        return Colors.red.shade400;
+        return const Color(0xFFEF5350);
     }
   }
 
@@ -111,15 +111,15 @@ class QualityBadge extends StatelessWidget {
   Color _getTextColor() {
     switch (quality) {
       case ColorMatchQuality.excellent:
-        return Colors.green.shade700;
+        return const Color(0xFF388E3C);
       case ColorMatchQuality.good:
-        return Colors.blue.shade700;
+        return const Color(0xFF1976D2);
       case ColorMatchQuality.acceptable:
-        return Colors.amber.shade700;
+        return const Color(0xFFF57F17);
       case ColorMatchQuality.poor:
-        return Colors.orange.shade700;
+        return const Color(0xFFE65100);
       case ColorMatchQuality.veryPoor:
-        return Colors.red.shade700;
+        return const Color(0xFFC62828);
     }
   }
 }

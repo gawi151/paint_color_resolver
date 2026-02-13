@@ -202,8 +202,9 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
     final currentState = state.value!;
 
     // Find the existing paint to preserve timestamps
-    final existingPaintIndex =
-        currentState.indexWhere((PaintColor p) => p.id == paintId);
+    final existingPaintIndex = currentState.indexWhere(
+      (p) => p.id == paintId,
+    );
     if (existingPaintIndex == -1) {
       throw ArgumentError('Paint with ID $paintId not found in state');
     }
@@ -287,8 +288,9 @@ class PaintInventoryNotifier extends AsyncNotifier<List<PaintColor>> {
     final currentState = state.value!;
 
     // Find the paint to remove
-    final existingPaintIndex =
-        currentState.indexWhere((PaintColor p) => p.id == paintId);
+    final existingPaintIndex = currentState.indexWhere(
+      (p) => p.id == paintId,
+    );
     if (existingPaintIndex == -1) {
       _log.warning('Paint ID $paintId not found in state');
       return;

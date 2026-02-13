@@ -3,7 +3,8 @@
     "allow": [
       "Bash(dart run build_runner build:*)",
       "Bash(where:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(dir:*)"
     ]
   }
 }

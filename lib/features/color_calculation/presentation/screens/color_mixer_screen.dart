@@ -1,14 +1,15 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Material, Slider;
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:paint_color_resolver/core/router/app_router.dart';
-import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
 import 'package:paint_color_resolver/features/color_calculation/presentation/providers/color_mixing_provider.dart';
 import 'package:paint_color_resolver/shared/utils/color_conversion_utils.dart';
 import 'package:paint_color_resolver/shared/widgets/color_picker_input.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 final _log = Logger('ColorMixer');
 
@@ -36,114 +37,125 @@ class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
   Widget build(BuildContext context) {
     final targetColor = ref.watch(targetColorProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Color Mixer'),
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Target Color Selection
-            Text(
-              'Target Color',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            ColorPickerInput(
-              initialHex: targetColor != null
-                  ? ColorConversionUtils.labToHex(targetColor)
-                  : '#FF0000',
-              onColorChanged:
-                  (
-                    LabColor labColor, {
-                    required bool isValidGamut,
-                  }) {
-                    // Delay provider modification until after widget
-                    // tree is built
-                    final update = Future.microtask(() {
-                      ref
-                          .read(targetColorProvider.notifier)
-                          .setTargetColor(labColor);
-                      _log.info(
-                        'Target color set (Gamut: $isValidGamut)',
-                      );
-                    });
-                    unawaited(update);
-                  },
-            ),
-            const SizedBox(height: 32),
-
-            // Number of Paints Selection
-            Text(
-              'Number of Paints to Mix',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            _buildPaintCountSelector(),
-            const SizedBox(height: 32),
-
-            // Quality Threshold
-            Text(
-              'Quality Threshold',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            _buildQualityThresholdSlider(),
-            const SizedBox(height: 32),
-
-            // Calculate Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed: targetColor != null && !_isCalculating
-                    ? () => _calculateAndNavigate(context)
-                    : null,
-                icon: _isCalculating
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation(Colors.white),
-                        ),
-                      )
-                    : const Icon(Icons.calculate),
-                label: Text(
-                  _isCalculating ? 'Calculating...' : 'Calculate Mixing',
-                ),
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: ShadTheme.of(context).colorScheme.card,
+            border: Border(
+              bottom: BorderSide(
+                color: ShadTheme.of(context).colorScheme.border,
               ),
             ),
-            const SizedBox(height: 16),
+          ),
+          child: const Text(
+            'Color Mixer',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Expanded(
+          child: ShadToaster(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Target Color Selection
+                  const Text(
+                    'Target Color',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  ColorPickerInput(
+                    initialHex: targetColor != null
+                        ? ColorConversionUtils.labToHex(targetColor)
+                        : '#FF0000',
+                    onColorChanged:
+                        (
+                          labColor, {
+                          required isValidGamut,
+                        }) {
+                          // Delay provider modification until after widget
+                          // tree is built
+                          final update = Future.microtask(() {
+                            ref
+                                .read(targetColorProvider.notifier)
+                                .setTargetColor(labColor);
+                            _log.info(
+                              'Target color set (Gamut: $isValidGamut)',
+                            );
+                          });
+                          unawaited(update);
+                        },
+                  ),
+                  const SizedBox(height: 32),
 
-            // Info text
-            if (targetColor == null)
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
-                  border: Border.all(color: Colors.orange.shade300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info, color: Colors.orange.shade700),
-                    const SizedBox(width: 12),
-                    Expanded(
+                  // Number of Paints Selection
+                  const Text(
+                    'Number of Paints to Mix',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildPaintCountSelector(),
+                  const SizedBox(height: 32),
+
+                  // Quality Threshold
+                  const Text(
+                    'Quality Threshold',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildQualityThresholdSlider(),
+                  const SizedBox(height: 32),
+
+                  // Calculate Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ShadButton(
+                      onPressed: targetColor != null && !_isCalculating
+                          ? () => _calculateAndNavigate(context)
+                          : null,
+                      leading: _isCalculating
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: ShadProgress(),
+                            )
+                          : const Icon(LucideIcons.slidersHorizontal),
                       child: Text(
-                        'Select a color to get started',
-                        style: TextStyle(color: Colors.orange.shade700),
+                        _isCalculating ? 'Calculating...' : 'Calculate Mixing',
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Info text
+                  if (targetColor == null)
+                    const ShadCard(
+                      child: Row(
+                        children: [
+                          Icon(
+                            LucideIcons.info,
+                            color: Color(0xFFFF9800),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Select a color to get started',
+                              style: TextStyle(color: Color(0xFFFF9800)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
               ),
-          ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -157,17 +169,21 @@ class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(right: i < 3 ? 12 : 0),
-              child: ChoiceChip(
-                selected: numberOfPaints == i,
-                onSelected: (selected) {
-                  if (selected) {
-                    ref
-                        .read(numberOfPaintsProvider.notifier)
-                        .setNumberOfPaints(i);
-                    _log.fine('Set number of paints to: $i');
-                  }
+              child: ShadButton(
+                onPressed: () {
+                  ref
+                      .read(numberOfPaintsProvider.notifier)
+                      .setNumberOfPaints(i);
+                  _log.fine('Set number of paints to: $i');
                 },
-                label: Text('$i Paint${i > 1 ? 's' : ''}'),
+                // Highlight selected paint count
+                backgroundColor: numberOfPaints == i
+                    ? ShadTheme.of(context).colorScheme.primary
+                    : null,
+                foregroundColor: numberOfPaints == i
+                    ? ShadTheme.of(context).colorScheme.primaryForeground
+                    : null,
+                child: Text('$i Paint${i > 1 ? 's' : ''}'),
               ),
             ),
           ),
@@ -184,19 +200,22 @@ class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Max Delta E (Color Difference):',
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: TextStyle(fontSize: 14),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                color: ShadTheme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: ShadTheme.of(context).radius,
               ),
               child: Text(
                 maxDeltaE.toStringAsFixed(1),
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                style: const TextStyle(
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -204,22 +223,25 @@ class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
           ],
         ),
         const SizedBox(height: 8),
-        Slider(
-          value: maxDeltaE,
-          min: 1,
-          max: 20,
-          divisions: 19,
-          label: maxDeltaE.toStringAsFixed(1),
-          onChanged: (value) {
-            ref.read(maxDeltaEThresholdProvider.notifier).setMaxDeltaE(value);
-            _log.fine('Set max Delta E to: $value');
-          },
+        Material(
+          child: Slider(
+            value: maxDeltaE,
+            min: 1,
+            max: 20,
+            divisions: 19,
+            label: maxDeltaE.toStringAsFixed(1),
+            onChanged: (value) {
+              ref.read(maxDeltaEThresholdProvider.notifier).setMaxDeltaE(value);
+              _log.fine('Set max Delta E to: $value');
+            },
+          ),
         ),
         const SizedBox(height: 8),
-        Text(
+        const Text(
           'Lower = stricter matches, Higher = more options',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Colors.grey,
+          style: TextStyle(
+            fontSize: 12,
+            color: Color(0xFF9E9E9E),
           ),
         ),
       ],
@@ -246,11 +268,11 @@ class _ColorMixerScreenState extends ConsumerState<ColorMixerScreen> {
       _log.severe('Mixing calculation failed', e);
       if (!context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Calculation failed: $e'),
+      ShadToaster.of(context).show(
+        ShadToast.destructive(
+          title: const Text('Calculation failed'),
+          description: Text(e.toString()),
           duration: const Duration(seconds: 3),
-          backgroundColor: Colors.red,
         ),
       );
     } finally {

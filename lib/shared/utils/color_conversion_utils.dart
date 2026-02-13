@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/services/color_converter.dart';
 
@@ -168,7 +168,7 @@ class ColorConversionUtils {
         int.parse(hex.replaceAll('#', ''), radix: 16) + 0xFF000000,
       );
     } on FormatException {
-      return Colors.white;
+      return const Color(0xFFFFFFFF);
     }
   }
 

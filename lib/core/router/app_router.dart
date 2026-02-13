@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:paint_color_resolver/core/layout/app_shell_screen.dart';
 import 'package:paint_color_resolver/features/color_calculation/presentation/screens/color_mixer_screen.dart';
 import 'package:paint_color_resolver/features/color_calculation/presentation/screens/mixing_results_screen.dart';

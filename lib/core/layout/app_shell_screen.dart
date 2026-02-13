@@ -1,8 +1,9 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:paint_color_resolver/core/router/app_router.dart';
 import 'package:paint_color_resolver/shared/widgets/responsive_bottom_nav.dart';
 import 'package:paint_color_resolver/shared/widgets/responsive_navigation_rail.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// Main app shell providing responsive navigation with AutoTabsRouter.
 ///
@@ -42,7 +43,7 @@ class AppShellScreen extends StatelessWidget {
 
             if (isDesktop) {
               // Desktop layout: Navigation Rail + Body (horizontal)
-              return Material(
+              return ShadToaster(
                 child: Row(
                   children: [
                     // Navigation Rail (fixed width sidebar)
@@ -58,19 +59,23 @@ class AppShellScreen extends StatelessWidget {
               );
             } else {
               // Mobile layout: Body + Bottom Navigation (vertical)
-              return Scaffold(
-                body: child,
-                bottomNavigationBar: ResponsiveBottomNav(
-                  activeIndex: activeIndex,
-                  onTabChanged: tabsRouter.setActiveIndex,
-                  onMoreTapped: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('More menu coming soon'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  },
+              return ShadToaster(
+                child: Column(
+                  children: [
+                    Expanded(child: child),
+                    ResponsiveBottomNav(
+                      activeIndex: activeIndex,
+                      onTabChanged: tabsRouter.setActiveIndex,
+                      onMoreTapped: () {
+                        ShadToaster.of(context).show(
+                          const ShadToast(
+                            description: Text('More menu coming soon'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               );
             }

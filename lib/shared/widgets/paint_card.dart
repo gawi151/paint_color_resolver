@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
 import 'package:paint_color_resolver/shared/models/paint_color.dart';
 import 'package:paint_color_resolver/shared/utils/color_conversion_utils.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// A card widget displaying a paint color with visual preview and action menu.
 ///
@@ -41,32 +42,27 @@ class PaintCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: ShadCard(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // Color preview circle
+              _ColorPreview(labColor: paint.labColor),
+              const SizedBox(width: 16),
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            // Color preview circle
-            _ColorPreview(labColor: paint.labColor),
-            const SizedBox(width: 16),
+              // Paint info (name, brand, debug LAB)
+              Expanded(child: _PaintInfo(paint: paint)),
 
-            // Paint info (name, brand, debug LAB)
-            Expanded(
-              child: _PaintInfo(
-                paint: paint,
-                isDarkMode: isDarkMode,
+              // Menu button (edit/delete options)
+              _MenuButton(
+                onEdit: onEdit,
+                onDelete: onDelete,
               ),
-            ),
-
-            // Menu button (edit/delete options)
-            _MenuButton(
-              onEdit: onEdit,
-              onDelete: onDelete,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -81,6 +77,7 @@ class _ColorPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rgbColor = ColorConversionUtils.labToRgb(labColor);
+    final theme = ShadTheme.of(context);
 
     return Container(
       width: 56,
@@ -89,7 +86,7 @@ class _ColorPreview extends StatelessWidget {
         shape: BoxShape.circle,
         color: rgbColor,
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
+          color: theme.colorScheme.border,
           width: 1.5,
         ),
         boxShadow: [
@@ -106,22 +103,20 @@ class _ColorPreview extends StatelessWidget {
 
 /// Displays paint name, brand, and debug LAB values (if in debug mode).
 class _PaintInfo extends StatelessWidget {
-  const _PaintInfo({
-    required this.paint,
-    required this.isDarkMode,
-  });
+  const _PaintInfo({required this.paint});
   final PaintColor paint;
-  final bool isDarkMode;
 
   @override
   Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Paint name
         Text(
           paint.name,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          style: theme.textTheme.p.copyWith(
             fontWeight: FontWeight.w600,
           ),
           maxLines: 1,
@@ -133,9 +128,7 @@ class _PaintInfo extends StatelessWidget {
         // Brand label
         Text(
           _brandDisplayName(paint.brand),
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
+          style: theme.textTheme.small,
         ),
 
         // Debug: Show LAB values (only in debug mode)
@@ -167,20 +160,23 @@ class _DebugLabDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: Theme.of(
-          context,
-        ).colorScheme.errorContainer.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(4),
+        color: theme.colorScheme.destructive.withValues(alpha: 0.1),
+        borderRadius: theme.radius,
+        border: Border.all(
+          color: theme.colorScheme.destructive.withValues(alpha: 0.3),
+        ),
       ),
       child: Text(
         'L:${labColor.l.toStringAsFixed(1)} '
         'a:${labColor.a.toStringAsFixed(1)} '
         'b:${labColor.b.toStringAsFixed(1)}',
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: Theme.of(context).colorScheme.error,
+        style: theme.textTheme.small.copyWith(
+          color: theme.colorScheme.destructive,
           fontFamily: 'monospace',
         ),
       ),
@@ -188,7 +184,7 @@ class _DebugLabDisplay extends StatelessWidget {
   }
 }
 
-/// Menu button that opens a BottomSheet with edit/delete options.
+/// Menu button that opens a dialog with edit/delete options.
 class _MenuButton extends StatelessWidget {
   const _MenuButton({
     required this.onEdit,
@@ -199,32 +195,48 @@ class _MenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton<String>(
-      itemBuilder: (BuildContext context) => [
-        PopupMenuItem<String>(
-          value: 'edit',
-          onTap: onEdit,
-          child: const Row(
-            children: [
-              Icon(Icons.edit_outlined, size: 18),
-              SizedBox(width: 12),
-              Text('Edit'),
-            ],
+    return ShadButton.ghost(
+      leading: const Icon(LucideIcons.ellipsisVertical, size: 18),
+      onPressed: () async {
+        await showShadDialog<void>(
+          context: context,
+          builder: (context) => ShadDialog(
+            title: const Text('Actions'),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ShadButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onEdit();
+                  },
+                  child: const Row(
+                    children: [
+                      Icon(LucideIcons.pencil, size: 18),
+                      SizedBox(width: 12),
+                      Text('Edit'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ShadButton.destructive(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onDelete();
+                  },
+                  child: const Row(
+                    children: [
+                      Icon(LucideIcons.trash, size: 18),
+                      SizedBox(width: 12),
+                      Text('Delete'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        PopupMenuItem<String>(
-          value: 'delete',
-          onTap: onDelete,
-          child: const Row(
-            children: [
-              Icon(Icons.delete_outline, size: 18, color: Colors.red),
-              SizedBox(width: 12),
-              Text('Delete', style: TextStyle(color: Colors.red)),
-            ],
-          ),
-        ),
-      ],
-      icon: const Icon(Icons.more_vert),
+        );
+      },
     );
   }
 }

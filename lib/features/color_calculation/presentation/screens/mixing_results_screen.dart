@@ -1,10 +1,11 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/services/color_converter.dart';
 import 'package:paint_color_resolver/features/color_calculation/presentation/providers/color_mixing_provider.dart';
 import 'package:paint_color_resolver/features/color_calculation/presentation/widgets/mixing_result_card.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// Screen displaying the calculated mixing recommendations.
 ///
@@ -28,93 +29,118 @@ class MixingResultsScreen extends ConsumerWidget {
     final targetColor = ref.watch(targetColorProvider);
     final resultsAsync = ref.watch(sortedMixingResultsProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mixing Recommendations'),
-        elevation: 0,
-      ),
-      body: resultsAsync.when(
-        // Results loaded successfully
-        data: (results) {
-          if (results.isEmpty) {
-            return _buildEmptyState(context);
-          }
-
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                // Target color display at top
-                if (targetColor != null) ...[
-                  _buildTargetColorSection(context, targetColor),
-                  const Divider(height: 0),
-                ],
-
-                // Results list
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(12),
-                  itemCount: results.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) => MixingResultCard(
-                    result: results[index],
-                    index: index + 1,
-                    targetColor: targetColor,
-                  ),
-                ),
-              ],
+    return Column(
+      children: [
+        // Custom AppBar replacement
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: ShadTheme.of(context).colorScheme.card,
+            border: Border(
+              bottom: BorderSide(
+                color: ShadTheme.of(context).colorScheme.border,
+              ),
             ),
-          );
-        },
-
-        // Loading state
-        loading: () => const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Calculating optimal mixes...'),
-            ],
           ),
-        ),
-
-        // Error state
-        error: (error, stackTrace) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
-              const Icon(
-                Icons.error_outline,
-                size: 64,
-                color: Colors.red,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Calculation failed',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  error.toString(),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
+              ShadButton.ghost(
+                leading: const Icon(LucideIcons.arrowLeft),
                 onPressed: () => context.router.pop(),
-                icon: const Icon(Icons.arrow_back),
-                label: const Text('Back to Setup'),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Mixing Recommendations',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ],
           ),
         ),
-      ),
+        // Body
+        Expanded(
+          child: resultsAsync.when(
+            // Results loaded successfully
+            data: (results) {
+              if (results.isEmpty) {
+                return _buildEmptyState(context);
+              }
+
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Target color display at top
+                    if (targetColor != null) ...[
+                      _buildTargetColorSection(context, targetColor),
+                      const ShadSeparator.horizontal(),
+                    ],
+
+                    // Results list
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(12),
+                      itemCount: results.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) => MixingResultCard(
+                        result: results[index],
+                        index: index + 1,
+                        targetColor: targetColor,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+
+            // Loading state
+            loading: () => const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ShadProgress(),
+                  SizedBox(height: 16),
+                  Text('Calculating optimal mixes...'),
+                ],
+              ),
+            ),
+
+            // Error state
+            error: (error, stackTrace) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    LucideIcons.circleX,
+                    size: 64,
+                    color: ShadTheme.of(context).colorScheme.destructive,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Calculation failed',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      error.toString(),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ShadButton(
+                    onPressed: () => context.router.pop(),
+                    child: const Text('Back to Setup'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -126,13 +152,13 @@ class MixingResultsScreen extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.all(16),
-      color: Colors.grey.shade50,
+      color: ShadTheme.of(context).colorScheme.muted,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Target Color',
-            style: Theme.of(context).textTheme.titleMedium,
+            style: ShadTheme.of(context).textTheme.large,
           ),
           const SizedBox(height: 12),
           Row(
@@ -143,7 +169,9 @@ class MixingResultsScreen extends ConsumerWidget {
                 height: 80,
                 decoration: BoxDecoration(
                   color: rgbColor,
-                  border: Border.all(color: Colors.grey),
+                  border: Border.all(
+                    color: ShadTheme.of(context).colorScheme.border,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
@@ -155,20 +183,20 @@ class MixingResultsScreen extends ConsumerWidget {
                   children: [
                     Text(
                       'LAB Color Values',
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: ShadTheme.of(context).textTheme.small,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'L: ${targetColor.l.toStringAsFixed(1)}',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: ShadTheme.of(context).textTheme.p,
                     ),
                     Text(
                       'a: ${targetColor.a.toStringAsFixed(1)}',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: ShadTheme.of(context).textTheme.p,
                     ),
                     Text(
                       'b: ${targetColor.b.toStringAsFixed(1)}',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: ShadTheme.of(context).textTheme.p,
                     ),
                   ],
                 ),
@@ -187,14 +215,14 @@ class MixingResultsScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.search_off,
+            LucideIcons.searchX,
             size: 64,
-            color: Colors.grey.shade400,
+            color: ShadTheme.of(context).colorScheme.mutedForeground,
           ),
           const SizedBox(height: 16),
           Text(
             'No Matching Combinations Found',
-            style: Theme.of(context).textTheme.titleMedium,
+            style: ShadTheme.of(context).textTheme.large,
           ),
           const SizedBox(height: 8),
           Padding(
@@ -203,16 +231,15 @@ class MixingResultsScreen extends ConsumerWidget {
               'Try adjusting the quality threshold or selecting'
               ' a different target color',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey,
+              style: ShadTheme.of(context).textTheme.p.copyWith(
+                color: ShadTheme.of(context).colorScheme.mutedForeground,
               ),
             ),
           ),
           const SizedBox(height: 24),
-          ElevatedButton.icon(
+          ShadButton(
             onPressed: () => context.router.pop(),
-            icon: const Icon(Icons.arrow_back),
-            label: const Text('Try Again'),
+            child: const Text('Try Again'),
           ),
         ],
       ),

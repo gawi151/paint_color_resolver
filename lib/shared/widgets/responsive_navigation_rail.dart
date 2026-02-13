@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:flutter/widgets.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// Desktop navigation rail widget for the Paint Color Resolver app.
 ///
 /// Displays a vertical sidebar with navigation items for desktop/tablet screens.
-/// Uses Phosphor icons for a clean, modern appearance and highlights the
+/// Uses Lucide icons for a clean, modern appearance and highlights the
 /// currently active tab.
 ///
 /// ## Features:
 /// - Fixed width sidebar (~80px with labels)
-/// - Phosphor icon library for consistency
+/// - Lucide icon library for consistency
 /// - Active tab highlighting
 /// - Smooth transitions between screens
 /// - Index-based tab callbacks for AutoTabsRouter
@@ -53,52 +53,23 @@ class ResponsiveNavigationRail extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     final isActive = _isActive(index);
+    final theme = ShadTheme.of(context);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-          decoration: BoxDecoration(
-            color: isActive
-                ? Theme.of(context).primaryColor.withValues(alpha: 0.1)
-                : Colors.transparent,
-            border: Border(
-              left: BorderSide(
-                color: isActive
-                    ? Theme.of(context).primaryColor
-                    : Colors.transparent,
-                width: 3,
-              ),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                color: isActive
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey[600],
-                size: 24,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                  color: isActive
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey[600],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: ShadButton.ghost(
+        onPressed: onTap,
+        width: double.infinity,
+        leading: Icon(icon, size: 20),
+        // Highlight active state
+        backgroundColor: isActive
+            ? theme.colorScheme.primary.withValues(alpha: 0.1)
+            : null,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
           ),
         ),
       ),
@@ -107,15 +78,15 @@ class ResponsiveNavigationRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+
     return Container(
       width: 80,
       decoration: BoxDecoration(
         border: Border(
-          right: BorderSide(
-            color: Colors.grey[200]!,
-          ),
+          right: BorderSide(color: theme.colorScheme.border),
         ),
-        color: Colors.white,
+        color: theme.colorScheme.background,
       ),
       child: SafeArea(
         child: SingleChildScrollView(
@@ -126,7 +97,7 @@ class ResponsiveNavigationRail extends StatelessWidget {
                 context,
                 index: 0,
                 label: 'Mixer',
-                icon: PhosphorIcons.palette(),
+                icon: LucideIcons.palette,
                 onTap: () => onTabChanged(0),
               ),
 
@@ -135,12 +106,14 @@ class ResponsiveNavigationRail extends StatelessWidget {
                 context,
                 index: 1,
                 label: 'Library',
-                icon: PhosphorIcons.list(),
+                icon: LucideIcons.list,
                 onTap: () => onTabChanged(1),
               ),
 
               const SizedBox(height: 8),
-              const Divider(height: 1, indent: 8, endIndent: 8),
+              const ShadSeparator.horizontal(
+                margin: EdgeInsets.symmetric(horizontal: 8),
+              ),
               const SizedBox(height: 8),
 
               // History - Future feature
@@ -148,11 +121,11 @@ class ResponsiveNavigationRail extends StatelessWidget {
                 context,
                 index: 2,
                 label: 'History',
-                icon: PhosphorIcons.clockClockwise(),
+                icon: LucideIcons.history,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('History feature coming soon'),
+                  ShadToaster.of(context).show(
+                    const ShadToast(
+                      description: Text('History feature coming soon'),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -164,11 +137,11 @@ class ResponsiveNavigationRail extends StatelessWidget {
                 context,
                 index: 3,
                 label: 'Favorites',
-                icon: PhosphorIcons.star(),
+                icon: LucideIcons.star,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Favorites feature coming soon'),
+                  ShadToaster.of(context).show(
+                    const ShadToast(
+                      description: Text('Favorites feature coming soon'),
                       duration: Duration(seconds: 2),
                     ),
                   );

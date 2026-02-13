@@ -26,7 +26,7 @@ part of 'mixer_state_provider.dart';
 /// ```
 
 @ProviderFor(mixerState)
-const mixerStateProvider = MixerStateProvider._();
+final mixerStateProvider = MixerStateProvider._();
 
 /// Provider that exposes the complete mixer state as a single read-only object.
 ///
@@ -64,7 +64,7 @@ final class MixerStateProvider
   /// Text('Target: ${mixerState.targetColor}, '
   ///      'Paints: ${mixerState.numberOfPaints}');
   /// ```
-  const MixerStateProvider._()
+  MixerStateProvider._()
     : super(
         from: null,
         argument: null,
@@ -112,7 +112,7 @@ String _$mixerStateHash() => r'd3a69b087e4477b539aff3d2bd966398afe30d32';
 /// ```
 
 @ProviderFor(MixerReset)
-const mixerResetProvider = MixerResetProvider._();
+final mixerResetProvider = MixerResetProvider._();
 
 /// Provider for resetting all mixer state to defaults.
 ///
@@ -137,7 +137,7 @@ final class MixerResetProvider extends $NotifierProvider<MixerReset, void> {
   /// // Reset all mixer settings to defaults
   /// ref.read(mixerResetProvider.notifier).resetAll();
   /// ```
-  const MixerResetProvider._()
+  MixerResetProvider._()
     : super(
         from: null,
         argument: null,
@@ -183,7 +183,6 @@ abstract class _$MixerReset extends $Notifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
-    build();
     final ref = this.ref as $Ref<void, void>;
     final element =
         ref.element
@@ -193,6 +192,6 @@ abstract class _$MixerReset extends $Notifier<void> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, null);
+    element.handleCreate(ref, build);
   }
 }

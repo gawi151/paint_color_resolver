@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide TextButton;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:paint_color_resolver/features/paint_library/data/providers/paint_inventory_provider.dart';
 import 'package:paint_color_resolver/shared/models/paint_color.dart';
 import 'package:paint_color_resolver/shared/widgets/paint_form.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 final _log = Logger('EditPaintScreen');
 
@@ -70,9 +71,9 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
 
       if (mounted) {
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Updated ${formData.name}'),
+        ShadToaster.of(context).show(
+          ShadToast(
+            title: Text('Updated ${formData.name}'),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -84,11 +85,11 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
       _log.severe('Failed to update paint', e, stackTrace);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error updating paint: $e'),
+        ShadToaster.of(context).show(
+          ShadToast.destructive(
+            title: const Text('Error updating paint'),
+            description: Text(e.toString()),
             duration: const Duration(seconds: 3),
-            backgroundColor: Colors.red,
           ),
         );
       }
@@ -99,67 +100,64 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
     final paintId = _paintId;
 
     // Show confirmation dialog
-    final confirmed = await showDialog<bool>(
+    await showShadDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => ShadDialog(
         title: const Text('Delete Paint?'),
-        content: const Text(
+        description: const Text(
           'This action cannot be undone. The paint will be permanently '
           'removed from your inventory.',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
+          ShadButton.outline(
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+          ShadButton.destructive(
+            onPressed: () async {
+              Navigator.pop(context);
+
+              try {
+                _log.info('Deleting paint ID $paintId');
+
+                // Call the provider notifier to delete the paint
+                await ref
+                    .read(paintInventoryProvider.notifier)
+                    .removePaint(paintId);
+
+                _log.info('Paint deleted successfully ID $paintId');
+
+                if (!context.mounted) return;
+
+                // Show success message
+                ShadToaster.of(context).show(
+                  const ShadToast(
+                    title: Text('Paint deleted'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+
+                // Pop back to paint library screen
+                context.router.pop();
+              } on Exception catch (e, stackTrace) {
+                _log.severe('Failed to delete paint', e, stackTrace);
+
+                if (!context.mounted) return;
+
+                ShadToaster.of(context).show(
+                  ShadToast.destructive(
+                    title: const Text('Error deleting paint'),
+                    description: Text(e.toString()),
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              }
+            },
             child: const Text('Delete'),
           ),
         ],
       ),
     );
-
-    if (confirmed != true) return;
-
-    try {
-      _log.info('Deleting paint ID $paintId');
-
-      // Call the provider notifier to delete the paint
-      await ref
-          .read(paintInventoryProvider.notifier)
-          .removePaint(paintId);
-
-      _log.info('Paint deleted successfully ID $paintId');
-
-      if (mounted) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Paint deleted'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-
-        // Pop back to paint library screen
-        context.router.pop();
-      }
-    } on Exception catch (e, stackTrace) {
-      _log.severe('Failed to delete paint', e, stackTrace);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error deleting paint: $e'),
-            duration: const Duration(seconds: 3),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
   }
 
   @override
@@ -169,99 +167,136 @@ class _EditPaintScreenState extends ConsumerState<EditPaintScreen> {
     // Watch the paint inventory to find this specific paint
     final inventoryAsync = ref.watch(paintInventoryProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Paint'),
-        elevation: 0,
-        actions: [
-          // Delete button in app bar
-          IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.red),
-            onPressed: _handleDelete,
-            tooltip: 'Delete paint',
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: ShadTheme.of(context).colorScheme.card,
+            border: Border(
+              bottom: BorderSide(
+                color: ShadTheme.of(context).colorScheme.border,
+              ),
+            ),
           ),
-        ],
-      ),
-      body: inventoryAsync.when(
-        data: (paints) {
-          // Find the paint by ID
-          final matchingPaints = paints.where((p) => p.id == paintId).toList();
-          final paint = matchingPaints.isNotEmpty ? matchingPaints.first : null;
-
-          if (paint == null) {
-            _log.warning('Paint ID $paintId not found in inventory');
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Paint not found',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'The paint may have been deleted.',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => context.router.pop(),
-                    child: const Text('Go Back'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return PaintForm(
-            initialPaint: paint,
-            allAvailableBrands: PaintBrand.values,
-            onSubmit: _handleSubmit,
-            submitLabel: 'Update Paint',
-            // Optimistic updates - no local loading state needed
-            onCancel: () {
-              context.router.pop();
-            },
-          );
-        },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, stackTrace) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
-              const Icon(
-                Icons.error_outline,
-                size: 64,
-                color: Colors.red,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Error loading paint',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                error.toString(),
-                style: const TextStyle(color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
+              ShadButton.ghost(
+                leading: const Icon(LucideIcons.arrowLeft),
                 onPressed: () => context.router.pop(),
-                child: const Text('Go Back'),
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Edit Paint',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ShadButton.ghost(
+                leading: const Icon(LucideIcons.trash, size: 18),
+                onPressed: _handleDelete,
               ),
             ],
           ),
         ),
-      ),
+        Expanded(
+          child: inventoryAsync.when(
+            data: (paints) {
+              // Find the paint by ID
+              final matchingPaints = paints
+                  .where((p) => p.id == paintId)
+                  .toList();
+              final paint = matchingPaints.isNotEmpty
+                  ? matchingPaints.first
+                  : null;
+
+              if (paint == null) {
+                _log.warning('Paint ID $paintId not found in inventory');
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        LucideIcons.circleX,
+                        size: 64,
+                        color: Color(0xFF9E9E9E),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Paint not found',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'The paint may have been deleted.',
+                        style: TextStyle(color: Color(0xFF9E9E9E)),
+                      ),
+                      const SizedBox(height: 24),
+                      ShadButton(
+                        onPressed: () => context.router.pop(),
+                        child: const Text('Go Back'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return ShadToaster(
+                child: PaintForm(
+                  initialPaint: paint,
+                  allAvailableBrands: PaintBrand.values,
+                  onSubmit: _handleSubmit,
+                  submitLabel: 'Update Paint',
+                  // Optimistic updates - no local loading state needed
+                  onCancel: () {
+                    context.router.pop();
+                  },
+                ),
+              );
+            },
+            loading: () => const Center(
+              child: ShadProgress(),
+            ),
+            error: (error, stackTrace) {
+              final theme = ShadTheme.of(context);
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      LucideIcons.circleX,
+                      size: 64,
+                      color: theme.colorScheme.destructive,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Error loading paint',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      error.toString(),
+                      style: const TextStyle(color: Color(0xFF9E9E9E)),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ShadButton(
+                      onPressed: () => context.router.pop(),
+                      child: const Text('Go Back'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
