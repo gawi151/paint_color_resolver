@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart' show Material;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
@@ -97,9 +98,11 @@ class _ColorPickerInputState extends State<ColorPickerInput> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Inline HueRingPicker
-        HueRingPicker(
-          pickerColor: _selectedColor,
-          onColorChanged: _handleColorChanged,
+        Material(
+          child: HueRingPicker(
+            pickerColor: _selectedColor,
+            onColorChanged: _handleColorChanged,
+          ),
         ),
 
         const SizedBox(height: 16),
