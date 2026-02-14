@@ -5,7 +5,8 @@
       "Bash(where:*)",
       "WebSearch",
       "Bash(dir:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(flutter:*)"
     ]
   }
 }
