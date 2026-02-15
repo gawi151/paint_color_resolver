@@ -8,9 +8,11 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 /// currently active tab.
 ///
 /// ## Features:
-/// - **Collapsible sidebar:** Toggle between icon-only (88px) and expanded (10% width)
+/// - **Collapsible sidebar:** Toggle between icon-only (88px) and expanded 
+/// (10% width)
 /// - **Responsive width:** Expanded state adapts to screen size (100-200px)
-/// - **Smooth animations:** 200ms transition between states with overflow clipping
+/// - **Smooth animations:** 200ms transition between states with overflow 
+/// clipping
 /// - **Lucide icon library** for consistency
 /// - **Active tab highlighting** with visual feedback
 /// - **State self-contained:** Manages collapse/expand internally
@@ -57,7 +59,8 @@ class ResponsiveNavigationRail extends StatefulWidget {
   final ValueChanged<int> onTabChanged;
 
   @override
-  State<ResponsiveNavigationRail> createState() => _ResponsiveNavigationRailState();
+  State<ResponsiveNavigationRail> createState() =>
+      _ResponsiveNavigationRailState();
 }
 
 class _ResponsiveNavigationRailState extends State<ResponsiveNavigationRail> {
@@ -82,7 +85,10 @@ class _ResponsiveNavigationRailState extends State<ResponsiveNavigationRail> {
 
         // Calculate responsive sidebar width (10% of available width)
         final sidebarWidth = _isExpanded
-            ? (availableWidth * 0.1).clamp(100.0, 200.0) // 10%, min 100, max 200
+            ? (availableWidth * 0.1).clamp(
+                100.0,
+                200.0,
+              ) // 10%, min 100, max 200
             : 88.0; // Collapsed: icon-only (88px fits icon + button padding)
 
         return Container(
@@ -109,7 +115,9 @@ class _ResponsiveNavigationRailState extends State<ResponsiveNavigationRail> {
                         child: ShadButton.ghost(
                           onPressed: _toggleExpanded,
                           child: Icon(
-                            _isExpanded ? LucideIcons.panelLeftClose : LucideIcons.panelLeft,
+                            _isExpanded
+                                ? LucideIcons.panelLeftClose
+                                : LucideIcons.panelLeft,
                             size: 18,
                           ),
                         ),
@@ -172,7 +180,9 @@ class _ResponsiveNavigationRailState extends State<ResponsiveNavigationRail> {
                         onTap: () {
                           ShadToaster.of(context).show(
                             const ShadToast(
-                              description: Text('Favorites feature coming soon'),
+                              description: Text(
+                                'Favorites feature coming soon',
+                              ),
                               duration: Duration(seconds: 2),
                             ),
                           );
@@ -204,7 +214,6 @@ class _NavigationRailItem extends StatelessWidget {
     required this.onTap,
     required this.activeIndex,
     required this.isExpanded,
-    super.key,
   });
 
   final int index;
@@ -228,7 +237,8 @@ class _NavigationRailItem extends StatelessWidget {
         backgroundColor: isActive
             ? theme.colorScheme.primary.withValues(alpha: 0.1)
             : null,
-        child: isExpanded // ← Conditional text rendering
+        child:
+            isExpanded // ← Conditional text rendering
             ? Text(
                 label,
                 style: TextStyle(
