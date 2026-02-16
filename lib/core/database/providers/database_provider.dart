@@ -31,7 +31,7 @@ part 'database_provider.g.dart';
 ///   },
 /// )
 /// ```
-@riverpod
+@Riverpod(keepAlive: true)
 AppDatabase database(Ref ref) {
   // When the provider is destroyed, the database connection is kept alive
   // In a real app, you might add cleanup logic here

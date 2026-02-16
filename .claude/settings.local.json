@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dart run build_runner build:*)"
+      "Bash(dart run build_runner build:*)",
+      "Bash(where:*)",
+      "WebSearch",
+      "Bash(dir:*)",
+      "Bash(test:*)",
+      "Bash(flutter:*)"
     ]
   }
 }

@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:flutter/widgets.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// Mobile bottom navigation bar widget for the Paint Color Resolver app.
 ///
 /// Displays a bottom navigation bar suitable for mobile/small screens with
-/// tabs for the main app features. Uses Phosphor icons and adapts to the
+/// tabs for the main app features. Uses Lucide icons and adapts to the
 /// current active tab.
 ///
 /// ## Features:
 /// - Fixed bottom position with safe area awareness
-/// - Phosphor icon library for consistency
+/// - Lucide icon library for consistency
 /// - 3 tabs: Mixer, Library, More
 /// - Active tab highlighting with color change
 /// - Index-based tab callbacks for AutoTabsRouter
@@ -43,38 +43,100 @@ class ResponsiveBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: activeIndex,
-      onTap: (index) {
-        if (index == 2) {
-          // More menu
-          onMoreTapped?.call();
-        } else {
-          // Tab navigation (Mixer or Library)
-          onTabChanged(index);
-        }
-      },
-      type: BottomNavigationBarType.fixed,
-      elevation: 8,
-      items: [
-        // Tab 0: Color Mixer - Main mixing functionality
-        BottomNavigationBarItem(
-          icon: Icon(PhosphorIcons.palette()),
-          label: 'Mixer',
-        ),
+    final theme = ShadTheme.of(context);
 
-        // Tab 1: Paint Library - Inventory management
-        BottomNavigationBarItem(
-          icon: Icon(PhosphorIcons.list()),
-          label: 'Library',
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.card,
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.border,
+          ),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.foreground.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(
+                context: context,
+                icon: LucideIcons.palette,
+                label: 'Mixer',
+                isActive: activeIndex == 0,
+                onTap: () => onTabChanged(0),
+              ),
+              _buildNavItem(
+                context: context,
+                icon: LucideIcons.list,
+                label: 'Library',
+                isActive: activeIndex == 1,
+                onTap: () => onTabChanged(1),
+              ),
+              _buildNavItem(
+                context: context,
+                icon: LucideIcons.ellipsis,
+                label: 'More',
+                isActive: activeIndex == 2,
+                onTap: () {
+                  if (onMoreTapped != null) {
+                    onMoreTapped!();
+                  } else {
+                    onTabChanged(2);
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-        // More - Settings and other options
-        BottomNavigationBarItem(
-          icon: Icon(PhosphorIcons.dotsThree()),
-          label: 'More',
+  Widget _buildNavItem({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    final theme = ShadTheme.of(context);
+
+    return Expanded(
+      child: ShadButton.ghost(
+        onPressed: onTap,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 24,
+              color: isActive
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.mutedForeground,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: theme.textTheme.small.copyWith(
+                color: isActive
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.mutedForeground,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

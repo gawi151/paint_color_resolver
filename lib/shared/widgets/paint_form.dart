@@ -1,9 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show InputDecoration, Material, OutlineInputBorder, TextFormField;
+import 'package:flutter/widgets.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
 import 'package:paint_color_resolver/shared/models/paint_color.dart';
 import 'package:paint_color_resolver/shared/utils/color_conversion_utils.dart';
 import 'package:paint_color_resolver/shared/widgets/brand_dropdown.dart';
 import 'package:paint_color_resolver/shared/widgets/color_picker_input.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// Form data submitted by PaintForm.
 class PaintFormData {
@@ -104,16 +107,12 @@ class PaintForm extends StatefulWidget {
 }
 
 class _PaintFormState extends State<PaintForm> {
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<ShadFormState>();
   late TextEditingController _nameController;
   late TextEditingController _brandMakerIdController;
   late PaintBrand? _selectedBrand;
   late LabColor? _selectedLabColor;
   late bool _isValidGamut;
-
-  // Validation state
-  String? _nameError;
-  bool _showNameError = false;
 
   @override
   void initState() {
@@ -144,19 +143,6 @@ class _PaintFormState extends State<PaintForm> {
     super.dispose();
   }
 
-  /// Validates the paint name field (required, non-empty).
-  ///
-  /// Called in real-time as user types.
-  void _validateNameField(String value) {
-    setState(() {
-      if (value.trim().isEmpty) {
-        _nameError = 'Paint name is required';
-      } else {
-        _nameError = null;
-      }
-    });
-  }
-
   /// Handles color selection from ColorPickerInput.
   void _onColorChanged(
     LabColor labColor, {
@@ -175,25 +161,33 @@ class _PaintFormState extends State<PaintForm> {
 
     // Validate name
     if (_nameController.text.trim().isEmpty) {
-      setState(() {
-        _nameError = 'Paint name is required';
-        _showNameError = true;
-      });
+      ShadToaster.of(context).show(
+        const ShadToast(
+          title: Text('Validation Error'),
+          description: Text('Paint name is required'),
+        ),
+      );
       isValid = false;
     }
 
     // Validate brand
     if (_selectedBrand == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a brand')),
+      ShadToaster.of(context).show(
+        const ShadToast(
+          title: Text('Validation Error'),
+          description: Text('Please select a brand'),
+        ),
       );
       isValid = false;
     }
 
     // Validate color
     if (_selectedLabColor == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a color')),
+      ShadToaster.of(context).show(
+        const ShadToast(
+          title: Text('Validation Error'),
+          description: Text('Please select a color'),
+        ),
       );
       isValid = false;
     }
@@ -216,7 +210,9 @@ class _PaintFormState extends State<PaintForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
+    final theme = ShadTheme.of(context);
+
+    return ShadForm(
       key: _formKey,
       child: SingleChildScrollView(
         child: Padding(
@@ -225,20 +221,18 @@ class _PaintFormState extends State<PaintForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Paint name field
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Paint Name *',
-                  hintText: 'e.g., Red Gore, Ultramarine Blue',
-                  prefixIcon: const Icon(Icons.edit_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+              Material(
+                child: TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Paint Name',
+                    hintText: 'e.g., Red Gore, Ultramarine Blue',
+                    border: OutlineInputBorder(
+                      borderRadius: theme.radius,
+                    ),
                   ),
-                  errorText: _showNameError ? _nameError : null,
-                  helperText: 'The name of the paint color',
+                  enabled: !widget.isLoading,
                 ),
-                onChanged: _validateNameField,
-                enabled: !widget.isLoading,
               ),
 
               const SizedBox(height: 20),
@@ -258,18 +252,18 @@ class _PaintFormState extends State<PaintForm> {
               const SizedBox(height: 20),
 
               // Brand maker ID field
-              TextFormField(
-                controller: _brandMakerIdController,
-                decoration: InputDecoration(
-                  labelText: 'Product Code (Optional)',
-                  hintText: 'e.g., vallejo_70926, citadel_51-01',
-                  prefixIcon: const Icon(Icons.tag_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+              Material(
+                child: TextFormField(
+                  controller: _brandMakerIdController,
+                  decoration: InputDecoration(
+                    labelText: 'Product Code (Optional)',
+                    hintText: 'e.g., vallejo_70926, citadel_51-01',
+                    border: OutlineInputBorder(
+                      borderRadius: theme.radius,
+                    ),
                   ),
-                  helperText: 'The product code or SKU from the brand',
+                  enabled: !widget.isLoading,
                 ),
-                enabled: !widget.isLoading,
               ),
 
               const SizedBox(height: 20),
@@ -277,7 +271,7 @@ class _PaintFormState extends State<PaintForm> {
               // Color picker
               Text(
                 'Paint Color *',
-                style: Theme.of(context).textTheme.labelLarge,
+                style: theme.textTheme.p,
               ),
               const SizedBox(height: 8),
               ColorPickerInput(
@@ -294,7 +288,7 @@ class _PaintFormState extends State<PaintForm> {
                 children: [
                   // Submit button
                   Expanded(
-                    child: ElevatedButton(
+                    child: ShadButton(
                       onPressed: widget.isLoading ? null : _handleSubmit,
                       child: widget.isLoading
                           ? Row(
@@ -303,9 +297,7 @@ class _PaintFormState extends State<PaintForm> {
                                 const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
+                                  child: ShadProgress(),
                                 ),
                                 const SizedBox(width: 8),
                                 Text(widget.submitLabel),
@@ -319,7 +311,7 @@ class _PaintFormState extends State<PaintForm> {
                   if (widget.onCancel != null) ...[
                     const SizedBox(width: 12),
                     Expanded(
-                      child: OutlinedButton(
+                      child: ShadButton.outline(
                         onPressed: widget.isLoading ? null : widget.onCancel,
                         child: const Text('Cancel'),
                       ),
@@ -333,9 +325,7 @@ class _PaintFormState extends State<PaintForm> {
               // Helper text
               Text(
                 'All fields marked with * are required',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+                style: theme.textTheme.small,
               ),
             ],
           ),

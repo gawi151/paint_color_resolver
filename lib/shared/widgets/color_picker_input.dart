@@ -1,10 +1,12 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Material;
+import 'package:flutter/widgets.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
 import 'package:paint_color_resolver/shared/utils/color_conversion_utils.dart';
 import 'package:paint_color_resolver/shared/widgets/debug_lab_display.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// Facade widget for inline color picking with HueRingPicker.
 ///
@@ -96,9 +98,11 @@ class _ColorPickerInputState extends State<ColorPickerInput> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Inline HueRingPicker
-        HueRingPicker(
-          pickerColor: _selectedColor,
-          onColorChanged: _handleColorChanged,
+        Material(
+          child: HueRingPicker(
+            pickerColor: _selectedColor,
+            onColorChanged: _handleColorChanged,
+          ),
         ),
 
         const SizedBox(height: 16),
@@ -112,25 +116,29 @@ class _ColorPickerInputState extends State<ColorPickerInput> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.errorContainer,
+              color: ShadTheme.of(
+                context,
+              ).colorScheme.destructive.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Theme.of(context).colorScheme.error,
+                color: ShadTheme.of(context).colorScheme.destructive,
               ),
             ),
             child: Row(
               children: [
                 Icon(
-                  Icons.warning_outlined,
-                  color: Theme.of(context).colorScheme.error,
+                  LucideIcons.triangleAlert,
+                  color: ShadTheme.of(context).colorScheme.destructive,
                   size: 20,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     ColorConversionUtils.gamutValidationMessage(),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onErrorContainer,
+                    style: ShadTheme.of(context).textTheme.small.copyWith(
+                      color: ShadTheme.of(
+                        context,
+                      ).colorScheme.destructiveForeground,
                     ),
                   ),
                 ),

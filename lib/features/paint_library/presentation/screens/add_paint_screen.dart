@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:paint_color_resolver/features/paint_library/data/providers/paint_inventory_provider.dart';
 import 'package:paint_color_resolver/shared/models/paint_color.dart';
 import 'package:paint_color_resolver/shared/widgets/paint_form.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 final _log = Logger('AddPaintScreen');
 
@@ -21,7 +22,7 @@ final _log = Logger('AddPaintScreen');
 ///
 /// State Management:
 /// - Uses `paintInventoryProvider.notifier.addPaint()` to persist
-/// - Converts color picker RGB → LAB using domain layer
+/// - Optimistic updates provide instant UI feedback
 ///
 /// Navigation:
 /// - Pushes on top of paint library screen
@@ -35,13 +36,7 @@ class AddPaintScreen extends ConsumerStatefulWidget {
 }
 
 class _AddPaintScreenState extends ConsumerState<AddPaintScreen> {
-  bool _isLoading = false;
-
   Future<void> _handleSubmit(PaintFormData formData) async {
-    setState(() {
-      _isLoading = true;
-    });
-
     try {
       _log.info('Adding paint: ${formData.name}');
 
@@ -59,51 +54,73 @@ class _AddPaintScreenState extends ConsumerState<AddPaintScreen> {
 
       if (mounted) {
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Added ${formData.name}'),
+        ShadToaster.of(context).show(
+          ShadToast(
+            title: Text('Added ${formData.name}'),
             duration: const Duration(seconds: 2),
           ),
         );
 
         // Pop back to paint library screen
-        if (mounted) context.router.pop();
+        context.router.pop();
       }
     } on Exception catch (e, stackTrace) {
       _log.severe('Failed to add paint', e, stackTrace);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error adding paint: $e'),
+        ShadToaster.of(context).show(
+          ShadToast.destructive(
+            title: const Text('Error adding paint'),
+            description: Text(e.toString()),
             duration: const Duration(seconds: 3),
-            backgroundColor: Colors.red,
           ),
         );
-
-        setState(() {
-          _isLoading = false;
-        });
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Paint'),
-        elevation: 0,
-      ),
-      body: PaintForm(
-        allAvailableBrands: PaintBrand.values,
-        onSubmit: _handleSubmit,
-        submitLabel: 'Add Paint',
-        isLoading: _isLoading,
-        onCancel: () {
-          context.router.pop();
-        },
-      ),
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: ShadTheme.of(context).colorScheme.card,
+            border: Border(
+              bottom: BorderSide(
+                color: ShadTheme.of(context).colorScheme.border,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              ShadButton.ghost(
+                leading: const Icon(LucideIcons.arrowLeft),
+                onPressed: () => context.router.pop(),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Add Paint',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ShadToaster(
+            child: PaintForm(
+              allAvailableBrands: PaintBrand.values,
+              onSubmit: _handleSubmit,
+              submitLabel: 'Add Paint',
+              // Optimistic updates - no local loading state needed
+              onCancel: () {
+                context.router.pop();
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

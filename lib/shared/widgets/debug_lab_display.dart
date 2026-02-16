@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/lab_color.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 /// A debug widget that displays LAB color values in a styled container.
 ///
@@ -57,12 +58,12 @@ class DebugLabDisplay extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(
+        color: ShadTheme.of(
           context,
-        ).colorScheme.tertiaryContainer.withValues(alpha: 0.5),
+        ).colorScheme.muted.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context).colorScheme.tertiary,
+          color: ShadTheme.of(context).colorScheme.border,
         ),
       ),
       child: Column(
@@ -71,9 +72,9 @@ class DebugLabDisplay extends StatelessWidget {
           // Title
           Text(
             title ?? 'Debug: LAB Values',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            style: ShadTheme.of(context).textTheme.small.copyWith(
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.tertiary,
+              color: ShadTheme.of(context).colorScheme.mutedForeground,
             ),
           ),
           const SizedBox(height: 8),
@@ -81,19 +82,19 @@ class DebugLabDisplay extends StatelessWidget {
           // LAB values with monospace font
           Text(
             'L: ${labColor.l.toStringAsFixed(2)}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            style: ShadTheme.of(context).textTheme.small.copyWith(
               fontFamily: 'monospace',
             ),
           ),
           Text(
             'a: ${labColor.a.toStringAsFixed(2)}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            style: ShadTheme.of(context).textTheme.small.copyWith(
               fontFamily: 'monospace',
             ),
           ),
           Text(
             'b: ${labColor.b.toStringAsFixed(2)}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            style: ShadTheme.of(context).textTheme.small.copyWith(
               fontFamily: 'monospace',
             ),
           ),

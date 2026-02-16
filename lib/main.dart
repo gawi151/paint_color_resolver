@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:paint_color_resolver/core/database/providers/database_provider.dart';
 import 'package:paint_color_resolver/core/router/app_router.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -14,11 +15,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final appRouter = AppRouter();
 
-    return MaterialApp.router(
+    return ShadApp.router(
       title: 'Paint Color Resolver',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      // Light theme
+      theme: ShadThemeData(
+        colorScheme: const ShadZincColorScheme.light(),
+      ),
+      // Dark theme
+      darkTheme: ShadThemeData(
+        colorScheme: const ShadZincColorScheme.dark(),
       ),
       routerConfig: appRouter.config(),
       builder: (context, child) => _AppInitializer(child: child),
@@ -47,12 +52,13 @@ class _AppInitializer extends ConsumerWidget {
       // Database initialized successfully - show the router's child
       data: (_) => child ?? const SizedBox.shrink(),
       // Still initializing
-      loading: () => const Scaffold(
-        body: Center(
+      loading: () => ColoredBox(
+        color: ShadTheme.of(context).colorScheme.background,
+        child: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
+              ShadProgress(),
               SizedBox(height: 16),
               Text('Initializing paint library...'),
             ],
@@ -60,12 +66,17 @@ class _AppInitializer extends ConsumerWidget {
         ),
       ),
       // Initialization failed
-      error: (error, stackTrace) => Scaffold(
-        body: Center(
+      error: (error, stackTrace) => ColoredBox(
+        color: ShadTheme.of(context).colorScheme.background,
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error, size: 64, color: Colors.red),
+              Icon(
+                LucideIcons.circleX,
+                size: 64,
+                color: ShadTheme.of(context).colorScheme.destructive,
+              ),
               const SizedBox(height: 16),
               const Text('Failed to initialize database'),
               const SizedBox(height: 8),

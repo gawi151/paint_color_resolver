@@ -1,4 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        DropdownButtonFormField,
+        DropdownMenuItem,
+        InputDecoration,
+        Material,
+        OutlineInputBorder;
+import 'package:flutter/widgets.dart';
 import 'package:paint_color_resolver/shared/models/paint_color.dart';
 
 /// A dropdown widget for selecting a paint brand.
@@ -74,50 +81,52 @@ class BrandDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (brands.isEmpty) {
-      return Center(
+      return const Center(
         child: Text(
           'No brands available',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.error,
+          style: TextStyle(
+            color: Color(0xFFFF0000),
           ),
         ),
       );
     }
 
-    return DropdownButtonFormField<PaintBrand>(
-      initialValue: selectedBrand,
-      items: brands
-          .map(
-            (brand) => DropdownMenuItem<PaintBrand>(
-              value: brand,
-              child: Text(getBrandDisplayName(brand)),
-            ),
-          )
-          .toList(),
-      onChanged: (PaintBrand? newBrand) {
-        if (newBrand != null) {
-          onChanged(newBrand);
-        }
-      },
-      decoration: InputDecoration(
-        labelText: isRequired ? '$label *' : label,
-        helperText: helperText,
-        errorText: errorText,
-        prefixIcon: const Icon(Icons.palette_outlined),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+    return Material(
+      child: DropdownButtonFormField<PaintBrand>(
+        initialValue: selectedBrand,
+        items: brands
+            .map(
+              (brand) => DropdownMenuItem<PaintBrand>(
+                value: brand,
+                child: Text(getBrandDisplayName(brand)),
+              ),
+            )
+            .toList(),
+        onChanged: (newBrand) {
+          if (newBrand != null) {
+            onChanged(newBrand);
+          }
+        },
+        decoration: InputDecoration(
+          labelText: isRequired ? '$label *' : label,
+          helperText: helperText,
+          errorText: errorText,
+          prefixIcon: const Icon(IconData(0xe3b8, fontFamily: 'MaterialIcons')),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
+        validator: (value) {
+          if (isRequired && value == null) {
+            return 'Please select a brand';
+          }
+          return null;
+        },
       ),
-      validator: (value) {
-        if (isRequired && value == null) {
-          return 'Please select a brand';
-        }
-        return null;
-      },
     );
   }
 }
