@@ -100,7 +100,7 @@ final class DatabaseProvider
         argument: null,
         retry: null,
         name: r'databaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -127,7 +127,7 @@ final class DatabaseProvider
   }
 }
 
-String _$databaseHash() => r'd7a35a83ad0e3d2e5c3a40b438bc9be186d6af93';
+String _$databaseHash() => r'e5a1fa0e8ff9aa131f847f28519ec2098e6d0f76';
 
 /// Provides the PaintColorsDao for paint inventory operations.
 ///
