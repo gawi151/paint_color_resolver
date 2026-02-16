@@ -3,7 +3,7 @@ version: 1.0.0+1
 publish_to: none
 environment:
   sdk: ^3.10.0
-  flutter: 3.41.0
+  flutter: ^3.41.0
 description: Paint Color Resolver is an application designed to help miniature and figurine painters achieve their desired colors by calculating optimal paint mixing ratios based on their available paint inventory.
 dependencies:
   auto_route: ^11.1.0
