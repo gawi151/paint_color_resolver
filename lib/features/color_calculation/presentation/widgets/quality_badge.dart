@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:paint_color_resolver/features/color_calculation/domain/models/color_match_quality.dart';
+import 'package:paint_color_resolver/shared/utils/color_utils.dart';
 
 /// Visual badge indicating the quality of a color match.
 ///
@@ -25,20 +26,22 @@ class QualityBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (compact) {
-      return _buildCompact();
+      return _buildCompact(context);
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: _getBackgroundColor(),
+        color: getQualityBadgeBackground(quality, context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _getBorderColor()),
+        border: Border.all(
+          color: getQualityBadgeBorder(quality, context),
+        ),
       ),
       child: Text(
         _getLabel(),
         style: TextStyle(
-          color: _getTextColor(),
+          color: getQualityBadgeText(quality, context),
           fontWeight: FontWeight.w600,
           fontSize: 12,
         ),
@@ -47,14 +50,17 @@ class QualityBadge extends StatelessWidget {
   }
 
   /// Builds a compact dot badge
-  Widget _buildCompact() {
+  Widget _buildCompact(BuildContext context) {
     return Container(
       width: 12,
       height: 12,
       decoration: BoxDecoration(
-        color: _getBackgroundColor(),
+        color: getQualityBadgeBackground(quality, context),
         shape: BoxShape.circle,
-        border: Border.all(color: _getBorderColor(), width: 2),
+        border: Border.all(
+          color: getQualityBadgeBorder(quality, context),
+          width: 2,
+        ),
       ),
     );
   }
@@ -72,54 +78,6 @@ class QualityBadge extends StatelessWidget {
         return 'Poor';
       case ColorMatchQuality.veryPoor:
         return 'Very Poor';
-    }
-  }
-
-  /// Gets the background color for the quality level
-  Color _getBackgroundColor() {
-    switch (quality) {
-      case ColorMatchQuality.excellent:
-        return const Color(0xFFE8F5E9);
-      case ColorMatchQuality.good:
-        return const Color(0xFFE3F2FD);
-      case ColorMatchQuality.acceptable:
-        return const Color(0xFFFFF8E1);
-      case ColorMatchQuality.poor:
-        return const Color(0xFFFFF3E0);
-      case ColorMatchQuality.veryPoor:
-        return const Color(0xFFFFEBEE);
-    }
-  }
-
-  /// Gets the border color for the quality level
-  Color _getBorderColor() {
-    switch (quality) {
-      case ColorMatchQuality.excellent:
-        return const Color(0xFF66BB6A);
-      case ColorMatchQuality.good:
-        return const Color(0xFF42A5F5);
-      case ColorMatchQuality.acceptable:
-        return const Color(0xFFFFCA28);
-      case ColorMatchQuality.poor:
-        return const Color(0xFFFF9800);
-      case ColorMatchQuality.veryPoor:
-        return const Color(0xFFEF5350);
-    }
-  }
-
-  /// Gets the text color for the quality level
-  Color _getTextColor() {
-    switch (quality) {
-      case ColorMatchQuality.excellent:
-        return const Color(0xFF388E3C);
-      case ColorMatchQuality.good:
-        return const Color(0xFF1976D2);
-      case ColorMatchQuality.acceptable:
-        return const Color(0xFFF57F17);
-      case ColorMatchQuality.poor:
-        return const Color(0xFFE65100);
-      case ColorMatchQuality.veryPoor:
-        return const Color(0xFFC62828);
     }
   }
 }
