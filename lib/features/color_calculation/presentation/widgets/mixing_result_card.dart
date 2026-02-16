@@ -37,6 +37,7 @@ class MixingResultCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ShadTheme.of(context);
+    final inventoryAsync = ref.watch(paintInventoryProvider);
 
     return ShadCard(
       child: Column(
@@ -105,7 +106,7 @@ class MixingResultCard extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                ..._buildPaintRatios(context, ref),
+                ..._buildPaintRatios(context, inventoryAsync),
               ],
             ),
           ),
@@ -166,102 +167,115 @@ class MixingResultCard extends ConsumerWidget {
   }
 
   /// Builds the paint ratio display widgets with paint names and brands
-  List<Widget> _buildPaintRatios(BuildContext context, WidgetRef ref) {
+  List<Widget> _buildPaintRatios(
+    BuildContext context,
+    AsyncValue<List<PaintColor>> inventoryAsync,
+  ) {
     final theme = ShadTheme.of(context);
-    final ratios = <Widget>[];
 
-    // Watch the paint inventory to get paint details
-    ref.watch(paintInventoryProvider).whenData((paints) {
-      // Create a map for fast lookups
-      final paintMap = {for (final p in paints) p.id: p};
+    return inventoryAsync.when(
+      loading: () => const [SizedBox()],
+      error: (error, stack) => [
+        Text(
+          'Error loading paints',
+          style: theme.textTheme.small.copyWith(
+            color: theme.colorScheme.destructive,
+          ),
+        ),
+      ],
+      data: (paints) {
+        final ratios = <Widget>[];
+        // Create a map for fast lookups
+        final paintMap = {for (final p in paints) p.id: p};
 
-      for (var i = 0; i < result.ratios.length; i++) {
-        final ratio = result.ratios[i];
-        final paint = paintMap[ratio.paintId];
+        for (var i = 0; i < result.ratios.length; i++) {
+          final ratio = result.ratios[i];
+          final paint = paintMap[ratio.paintId];
 
-        ratios.add(
-          Padding(
-            padding: EdgeInsets.only(top: i > 0 ? 6 : 0),
-            child: Row(
-              children: [
-                // Ratio percentage badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(
-                      alpha: 0.1,
-                    ),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    '${ratio.percentage}%',
-                    style: theme.textTheme.large.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-
-                // Color preview swatch
-                if (paint != null)
+          ratios.add(
+            Padding(
+              padding: EdgeInsets.only(top: i > 0 ? 6 : 0),
+              child: Row(
+                children: [
+                  // Ratio percentage badge
                   Container(
-                    width: 36,
-                    height: 36,
-                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: _getPaintDisplayColor(paint),
-                      border: Border.all(color: theme.colorScheme.border),
+                      color: theme.colorScheme.primary.withValues(
+                        alpha: 0.1,
+                      ),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                  ),
-
-                // Paint name and brand
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        paint?.name ?? 'Unknown Paint',
-                        style: theme.textTheme.large.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                    child: Text(
+                      '${ratio.percentage}%',
+                      style: theme.textTheme.large.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
                       ),
-                      if (paint != null)
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  // Color preview swatch
+                  if (paint != null)
+                    Container(
+                      width: 36,
+                      height: 36,
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: _getPaintDisplayColor(paint),
+                        border: Border.all(color: theme.colorScheme.border),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+
+                  // Paint name and brand
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          paint.brand.name.toUpperCase(),
-                          style: theme.textTheme.small.copyWith(
-                            color: theme.colorScheme.mutedForeground,
-                            fontSize: 11,
+                          paint?.name ?? 'Unknown Paint',
+                          style: theme.textTheme.large.copyWith(
+                            fontWeight: FontWeight.w600,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
-                    ],
-                  ),
-                ),
-
-                // Plus sign (if not last)
-                if (i < result.ratios.length - 1) ...[
-                  const SizedBox(width: 8),
-                  Text(
-                    '+',
-                    style: theme.textTheme.large.copyWith(
-                      fontWeight: FontWeight.bold,
+                        if (paint != null)
+                          Text(
+                            paint.brand.name.toUpperCase(),
+                            style: theme.textTheme.small.copyWith(
+                              color: theme.colorScheme.mutedForeground,
+                              fontSize: 11,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                      ],
                     ),
                   ),
-                ],
-              ],
-            ),
-          ),
-        );
-      }
-    });
 
-    return ratios;
+                  // Plus sign (if not last)
+                  if (i < result.ratios.length - 1) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      '+',
+                      style: theme.textTheme.large.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          );
+        }
+
+        return ratios;
+      },
+    );
   }
 
   /// Builds a color swatch for displaying LAB color
