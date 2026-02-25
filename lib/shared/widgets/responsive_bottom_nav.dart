@@ -114,6 +114,7 @@ class ResponsiveBottomNav extends StatelessWidget {
       child: ShadButton.ghost(
         onPressed: onTap,
         padding: const EdgeInsets.symmetric(vertical: 8),
+        height: 0,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

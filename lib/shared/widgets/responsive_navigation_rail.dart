@@ -8,10 +8,10 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 /// currently active tab.
 ///
 /// ## Features:
-/// - **Collapsible sidebar:** Toggle between icon-only (88px) and expanded 
+/// - **Collapsible sidebar:** Toggle between icon-only (88px) and expanded
 /// (10% width)
 /// - **Responsive width:** Expanded state adapts to screen size (100-200px)
-/// - **Smooth animations:** 200ms transition between states with overflow 
+/// - **Smooth animations:** 200ms transition between states with overflow
 /// clipping
 /// - **Lucide icon library** for consistency
 /// - **Active tab highlighting** with visual feedback
@@ -107,90 +107,96 @@ class _ResponsiveNavigationRailState extends State<ResponsiveNavigationRail> {
               ),
               child: SafeArea(
                 child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // Toggle button (panel icon)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: ShadButton.ghost(
-                          onPressed: _toggleExpanded,
-                          child: Icon(
-                            _isExpanded
-                                ? LucideIcons.panelLeftClose
-                                : LucideIcons.panelLeft,
-                            size: 18,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Column(
+                      children: [
+                        // Toggle button (panel icon)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: ShadButton.ghost(
+                            onPressed: _toggleExpanded,
+                            expands: true,
+                            child: Icon(
+                              _isExpanded
+                                  ? LucideIcons.panelLeftClose
+                                  : LucideIcons.panelLeft,
+                              size: 18,
+                            ),
                           ),
                         ),
-                      ),
 
-                      const SizedBox(height: 8),
-                      const ShadSeparator.horizontal(
-                        margin: EdgeInsets.symmetric(horizontal: 8),
-                      ),
-                      const SizedBox(height: 8),
+                        const SizedBox(height: 8),
+                        const ShadSeparator.horizontal(
+                          margin: EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                        const SizedBox(height: 8),
 
-                      // Tab 0: Color Mixer
-                      _NavigationRailItem(
-                        index: 0,
-                        label: 'Mixer',
-                        icon: LucideIcons.palette,
-                        onTap: () => widget.onTabChanged(0),
-                        activeIndex: widget.activeIndex,
-                        isExpanded: _isExpanded,
-                      ),
+                        // Tab 0: Color Mixer
+                        _NavigationRailItem(
+                          index: 0,
+                          label: 'Mixer',
+                          icon: LucideIcons.palette,
+                          onTap: () => widget.onTabChanged(0),
+                          activeIndex: widget.activeIndex,
+                          isExpanded: _isExpanded,
+                        ),
 
-                      // Tab 1: Paint Library
-                      _NavigationRailItem(
-                        index: 1,
-                        label: 'Library',
-                        icon: LucideIcons.list,
-                        onTap: () => widget.onTabChanged(1),
-                        activeIndex: widget.activeIndex,
-                        isExpanded: _isExpanded,
-                      ),
+                        // Tab 1: Paint Library
+                        _NavigationRailItem(
+                          index: 1,
+                          label: 'Library',
+                          icon: LucideIcons.list,
+                          onTap: () => widget.onTabChanged(1),
+                          activeIndex: widget.activeIndex,
+                          isExpanded: _isExpanded,
+                        ),
 
-                      const SizedBox(height: 8),
-                      const ShadSeparator.horizontal(
-                        margin: EdgeInsets.symmetric(horizontal: 8),
-                      ),
-                      const SizedBox(height: 8),
+                        const SizedBox(height: 8),
+                        const ShadSeparator.horizontal(
+                          margin: EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                        const SizedBox(height: 8),
 
-                      // History - Future feature
-                      _NavigationRailItem(
-                        index: 2,
-                        label: 'History',
-                        icon: LucideIcons.history,
-                        onTap: () {
-                          ShadToaster.of(context).show(
-                            const ShadToast(
-                              description: Text('History feature coming soon'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                        activeIndex: widget.activeIndex,
-                        isExpanded: _isExpanded,
-                      ),
-
-                      // Favorites - Future feature
-                      _NavigationRailItem(
-                        index: 3,
-                        label: 'Favorites',
-                        icon: LucideIcons.star,
-                        onTap: () {
-                          ShadToaster.of(context).show(
-                            const ShadToast(
-                              description: Text(
-                                'Favorites feature coming soon',
+                        // History - Future feature
+                        _NavigationRailItem(
+                          index: 2,
+                          label: 'History',
+                          icon: LucideIcons.history,
+                          onTap: () {
+                            ShadToaster.of(context).show(
+                              const ShadToast(
+                                description: Text(
+                                  'History feature coming soon',
+                                ),
+                                duration: Duration(seconds: 2),
                               ),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                        activeIndex: widget.activeIndex,
-                        isExpanded: _isExpanded,
-                      ),
-                    ],
+                            );
+                          },
+                          activeIndex: widget.activeIndex,
+                          isExpanded: _isExpanded,
+                        ),
+
+                        // Favorites - Future feature
+                        _NavigationRailItem(
+                          index: 3,
+                          label: 'Favorites',
+                          icon: LucideIcons.star,
+                          onTap: () {
+                            ShadToaster.of(context).show(
+                              const ShadToast(
+                                description: Text(
+                                  'Favorites feature coming soon',
+                                ),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          activeIndex: widget.activeIndex,
+                          isExpanded: _isExpanded,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -232,21 +238,39 @@ class _NavigationRailItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: ShadButton.ghost(
         onPressed: onTap,
-        leading: Icon(icon, size: 20),
         // Highlight active state
         backgroundColor: isActive
             ? theme.colorScheme.primary.withValues(alpha: 0.1)
             : null,
-        child:
-            isExpanded // ← Conditional text rendering
-            ? Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                ),
-              )
-            : null, // Icon-only when collapsed
+        height: 0,
+        expands: true,
+        child: Row(
+          mainAxisAlignment: .center,
+          children: [
+            Icon(icon, size: 20),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeInOut,
+              alignment: Alignment.centerLeft,
+              child: isExpanded
+                  ? Row(
+                      children: [
+                        const SizedBox(width: 8),
+                        Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: isActive
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ),
       ),
     );
   }
